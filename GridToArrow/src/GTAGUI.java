@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -80,11 +79,11 @@ public class GTAGUI extends JPanel implements ActionListener{
         		if (inputPath.list().length < 2) {
         			log.append("Source Folder is empty!" + newline);	
         		} else {
-        			log.append("running..." + newline);
+        			GTAFunctions.countAndCheck(inputPath);
         			try {
         				Thread t = new Thread( new Runnable () {
         						public void run() {
-        							GTAFunctions.countAndCheck(inputPath);
+        							TemplateBuilder.createTemplate();
         						}
         				});
         				t.start();
