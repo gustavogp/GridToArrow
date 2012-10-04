@@ -28,7 +28,7 @@ public class GTAGUI extends JPanel implements ActionListener{
 			super (new BorderLayout());
 			
 			//Create the log first, because the action listeners
-	        log = new JTextArea(15,60);
+	        log = new JTextArea(25,60);
 	        log.setMargin(new Insets(5,5,5,5));
 	        log.setEditable(false);
 	        JScrollPane logScrollPane = new JScrollPane(log);
@@ -84,7 +84,7 @@ public class GTAGUI extends JPanel implements ActionListener{
         			try {
         				Thread t = new Thread( new Runnable () {
         						public void run() {
-        					//		FolderReader.main(inputPath);
+        							GTAFunctions.countAndCheck(inputPath);
         						}
         				});
         				t.start();
@@ -116,6 +116,10 @@ public class GTAGUI extends JPanel implements ActionListener{
 		
 	}
 
+	public static void generalMessage (String msg) {
+		log.append(msg + newline);
+	}
+	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run () {
