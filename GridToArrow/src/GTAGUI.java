@@ -83,7 +83,7 @@ public class GTAGUI extends JPanel implements ActionListener{
         			try {
         				Thread t = new Thread( new Runnable () {
         						public void run() {
-        							TemplateBuilder.createTemplate();
+        					//		TemplateBuilder.createTemplate();
         						}
         				});
         				t.start();
@@ -117,6 +117,7 @@ public class GTAGUI extends JPanel implements ActionListener{
 
 	public static void generalMessage (String msg) {
 		log.append(msg + newline);
+		log.setCaretPosition(log.getDocument().getLength());
 	}
 	
 	public static void main(String[] args) {
