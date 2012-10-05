@@ -72,5 +72,24 @@ public class GTAFunctions {
 		}
 		GTAGUI.generalMessage("Weeks in this quarter: " + wks);
 		
+		// list subfamilies
+		ArrayList<String> subFamilies = new ArrayList<String>();
+		
+		for (Row r : sheet0) {
+			try {
+				if (r.getRowNum() > 6 && 
+					!(r.getCell(1).getStringCellValue().contains("Total")) &&
+					!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) && 
+					!(sheet0.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
+				subFamilies.add(r.getCell(1).getStringCellValue());
+				}
+			} catch (NullPointerException e) {
+			//	e.printStackTrace();
+			} catch (IllegalStateException e) {
+				//do nothing
+			}
+		}
+		
+		GTAGUI.generalMessage("SubFamilies: " + subFamilies); //testing only, delete later
 	}
 }
