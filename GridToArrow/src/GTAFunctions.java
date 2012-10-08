@@ -82,6 +82,11 @@ public class GTAFunctions {
 		}
 		GTAGUI.generalMessage("SubFamilies: " + subFamilies); //testing only, delete later
 		
+		//create map Sku to SubFamily
+		Map<String, String> skuSubF = new HashMap<String, String>();
+		skuSubF = createSkuSubF(sheet1);
+		GTAGUI.generalMessage("Map SKU to SubFamily" +skuSubF);//testing only, delete later
+		
 		//create total/wk/subfamily
 		Map<Integer, HashMap<String, Integer>> weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, wkRow0, sheet0);
@@ -89,9 +94,7 @@ public class GTAFunctions {
 		//create mix/wk/sku
 		Map<Integer, HashMap<String, Integer>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSku = createMixPerWeek(wks, sheet1);
-		GTAGUI.generalMessage("Total Quantities per Sku per week" + weeklyMapsSku);//testing only, delete later
-		
-		//create map Sku to SubFamily
+	//	GTAGUI.generalMessage("Total Quantities per Sku per week" + weeklyMapsSku);//testing only, delete later
 		
 	}
 	
@@ -190,9 +193,37 @@ public class GTAFunctions {
 		return weeklyMapsSku;
 	}
 	
-	public static Map<String, String> createSkuSubF() {
+	public static Map<String, String> createSkuSubF(Sheet sheet1) {
 		Map<String, String> skuSubF = new HashMap<String, String>();
+		ArrayList<String> tempArray = new ArrayList<String>();
+		int test = 0, test1 = 0, test2 = 0, test3 = 0;
 		
+		for (Row r : sheet1) {
+			test++;
+			try {
+				if( r.getRowNum() > 6 &&
+					(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) ||
+					(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
+					r.getCell(3).getStringCellValue().contains("PPM")) {
+						tempArray.add(r.getCell(3).getStringCellValue());
+						test1++;
+				} else if(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+						sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK &&
+						 !(r.getCell(2).getStringCellValue().contains("Total"))) {
+					test2++;
+					for (String tmp : tempArray) {
+						skuSubF.put(tmp, r.getCell(2).getStringCellValue());
+						test3++;
+					}
+					tempArray = new ArrayList<String>();//create a new list object, instead of clearing the previous one
+				}
+			} catch (NullPointerException e) {
+				//	e.printStackTrace();
+			} catch (IllegalStateException e) {
+				//	e.printStackTrace();
+			}
+		}
+		GTAGUI.generalMessage("test: " + test + ", test1: " + test1 + ", test2: " + test2 + ", test3: " + test3);
 		return skuSubF;
 	}
 }
