@@ -92,11 +92,13 @@ public class GTAFunctions {
 		//create total/wk/subfamily
 		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, wkRow0, sheet0);
+		GTAGUI.generalMessage("Map qty by SubFamily" +weeklyMapsSF);//testing only, delete later
 		
 		//create mix/wk/sku
 		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
-		weeklyMapsSku = createMixPerWeek(wks, sheet1);
+		weeklyMapsSku = createMixPerWeek(wks, sheet1, wkRow0);
 		GTAGUI.generalMessage("Total Mix per Sku per week" + weeklyMapsSku);//testing only, delete later
+		TemplateBuilder.createMixTemplate(weeklyMapsSku);
 		
 	}
 	
@@ -156,17 +158,31 @@ public class GTAFunctions {
 		return weeklyMapsSF;
 	}
 	
-	public static Map<Integer, HashMap<String, Double>> createMixPerWeek(int wks, Sheet sheet1 ){
+	public static Map<Integer, HashMap<String, Double>> createMixPerWeek(int wks, Sheet sheet1, Row wkRow0 ){
 		Row wkRow1 = sheet1.getRow(7);
 		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
 		int columnIndexSku = 0;
+		int columnIndexSF =0;
 		for (int w = 1; w < wks + 1; w++) {
 			Map<String, Double> skuPerWk = new HashMap<String, Double>();//create a new map for each wk
-			//find the column index of this wk
+			//find the column index of this wk, for the SKU tab
 			for (Cell d : wkRow1) {
 				try {
 					if ((new Double(d.getNumericCellValue())).intValue() == w) {
 						columnIndexSku = d.getColumnIndex();
+						break;
+					}
+				} catch (NullPointerException e) {
+				//	e.printStackTrace();
+				} catch (IllegalStateException e) {
+				//	e.printStackTrace();
+				}
+			}
+			//find the column index of this wk, for the SubFamily tab
+			for (Cell d2 : wkRow0) {
+				try {
+					if ((new Double(d2.getNumericCellValue())).intValue() == w) {
+						columnIndexSF = d2.getColumnIndex();
 						break;
 					}
 				} catch (NullPointerException e) {
@@ -181,7 +197,8 @@ public class GTAFunctions {
 					if (rw.getRowNum() > 6 && 
 							!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
 							rw.getCell(3).getStringCellValue().contains("PPM"))  {
-						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSku).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
+					//	skuPerWk.put(rw.getCell(3).getStringCellValue(), (weeklyMapsSF.get(columnIndexSF-1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))).doubleValue() );
+						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 					}
 				} catch (NullPointerException e) {
 				//	e.printStackTrace();
