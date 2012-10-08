@@ -15,6 +15,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 
 public class GTAFunctions {
+	public static Map<String, String> skuSubF;
+	public static Map<Integer, HashMap<String, Integer>> weeklyMapsSF;
 	
 	public static void countAndCheck(File inputPath) {
 		ArrayList<File> folderFiles = new ArrayList<File>();
@@ -83,18 +85,18 @@ public class GTAFunctions {
 		GTAGUI.generalMessage("SubFamilies: " + subFamilies); //testing only, delete later
 		
 		//create map Sku to SubFamily
-		Map<String, String> skuSubF = new HashMap<String, String>();
+		skuSubF = new HashMap<String, String>();
 		skuSubF = createSkuSubF(sheet1);
-		GTAGUI.generalMessage("Map SKU to SubFamily" +skuSubF);//testing only, delete later
+	//	GTAGUI.generalMessage("Map SKU to SubFamily" +skuSubF);//testing only, delete later
 		
 		//create total/wk/subfamily
-		Map<Integer, HashMap<String, Integer>> weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
+		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, wkRow0, sheet0);
 		
 		//create mix/wk/sku
-		Map<Integer, HashMap<String, Integer>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Integer>>();
+		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
 		weeklyMapsSku = createMixPerWeek(wks, sheet1);
-	//	GTAGUI.generalMessage("Total Quantities per Sku per week" + weeklyMapsSku);//testing only, delete later
+		GTAGUI.generalMessage("Total Mix per Sku per week" + weeklyMapsSku);//testing only, delete later
 		
 	}
 	
@@ -154,12 +156,12 @@ public class GTAFunctions {
 		return weeklyMapsSF;
 	}
 	
-	public static Map<Integer, HashMap<String, Integer>> createMixPerWeek(int wks, Sheet sheet1 ){
+	public static Map<Integer, HashMap<String, Double>> createMixPerWeek(int wks, Sheet sheet1 ){
 		Row wkRow1 = sheet1.getRow(7);
-		Map<Integer, HashMap<String, Integer>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Integer>>();
+		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
 		int columnIndexSku = 0;
 		for (int w = 1; w < wks + 1; w++) {
-			Map<String, Integer> skuPerWk = new HashMap<String, Integer>();//create a new map for each wk
+			Map<String, Double> skuPerWk = new HashMap<String, Double>();//create a new map for each wk
 			//find the column index of this wk
 			for (Cell d : wkRow1) {
 				try {
@@ -173,22 +175,25 @@ public class GTAFunctions {
 				//	e.printStackTrace();
 				}
 			}
-			//build Sku Per Week map
+			//build Sku mix Per Week map
 			for (Row rw : sheet1) {
 				try {
 					if (rw.getRowNum() > 6 && 
 							!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
 							rw.getCell(3).getStringCellValue().contains("PPM"))  {
-						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue())).intValue());
+						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSku).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 					}
 				} catch (NullPointerException e) {
 				//	e.printStackTrace();
 				} catch (IllegalStateException e) {
 				//	e.printStackTrace();
+				} catch (ArithmeticException e) {
+//				//  e.printStackTrace();
+					skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
 				}
 				
 			}
-			weeklyMapsSku.put(w, (HashMap<String, Integer>) skuPerWk);
+			weeklyMapsSku.put(w, (HashMap<String, Double>) skuPerWk);
 		}
 		return weeklyMapsSku;
 	}
