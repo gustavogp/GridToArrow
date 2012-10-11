@@ -93,6 +93,7 @@ public class GTAFunctions {
 		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, wkRow0, sheet0);
 		GTAGUI.generalMessage("Map qty by SubFamily" +weeklyMapsSF);//testing only, delete later
+		TemplateBuilder.createTemplate();
 		
 		//create mix/wk/sku
 		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
@@ -197,7 +198,7 @@ public class GTAFunctions {
 					if (rw.getRowNum() > 6 && 
 							!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
 							rw.getCell(3).getStringCellValue().contains("PPM"))  {
-					//	skuPerWk.put(rw.getCell(3).getStringCellValue(), (weeklyMapsSF.get(columnIndexSF-1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))).doubleValue() );
+					//	skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(w).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 					}
 				} catch (NullPointerException e) {

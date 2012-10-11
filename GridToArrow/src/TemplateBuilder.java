@@ -93,6 +93,13 @@ public class TemplateBuilder {
 		row.createCell(50).setCellValue("Week 13 Req");
 		row.createCell(51).setCellValue("Week 14 Req");
 		
+		//for each account
+		
+			//create SKU column
+		
+			//add mix/*subFforecast
+		
+		
 		//create and save the xls file
 		try {
 			fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/ForecastTemplate_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
@@ -143,7 +150,7 @@ public class TemplateBuilder {
 				row.createCell(23).setCellValue("Week 14 Forecast");
 				
 				//create SKU column
-				for(String k : mixTemp.get(1).keySet()) {
+				for(String k : mixTemp.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
 					row = sheetMix.createRow(rCount);
 					rCount++;
 					row.createCell(1).setCellValue(k);
