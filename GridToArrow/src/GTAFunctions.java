@@ -17,11 +17,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class GTAFunctions {
 	public static Map<String, String> skuSubF;
 	public static Map<Integer, HashMap<String, Integer>> weeklyMapsSF;
+	public static Map<Integer, HashMap<String, Double>> weeklyMapsSku;
 	static int wks = 0;
+	static Row wkRow0;
 	
 	public static void countAndCheck(File inputPath) {
 		ArrayList<File> folderFiles = new ArrayList<File>();
-	//	File geo = null;
 		boolean isFirst = true;
 		boolean isLast = false;
 		
@@ -41,22 +42,7 @@ public class GTAFunctions {
 				
 			}
 		}
-		
-	/* testing a modified for{} above, but this one works fine	
-		for (File f2 : folderFiles) {
-			if (!(f2.getName().contains("DS_Store"))){
-				GTAGUI.generalMessage(f2.getName() + ", Last Modified on " + (new Date(f2.lastModified())).toString());
-			}
-			if (f2.getName().contains("geo") || f2.getName().contains("GEO")) {
-				geo = f2;
-			}
-		}
-		if (geo == null) {
-			GTAGUI.generalMessage("No \"geo\" file was found");
-		} else {
-			calculateMix(geo);
-		}
-		*/
+
 	}
 	
 	public static void calculateMix(File f2, boolean isFirst, boolean isLast){
@@ -76,7 +62,7 @@ public class GTAFunctions {
 			e.printStackTrace();
 		}
 		
-		Row wkRow0 = sheet0.getRow(7);
+		wkRow0 = sheet0.getRow(7);
 		
 		//how many weeks in this quarter, check only once
 		if(isFirst) {
@@ -101,28 +87,36 @@ public class GTAFunctions {
 				//do nothing
 			}
 		}
-		GTAGUI.generalMessage("SubFamilies: " + subFamilies); //testing only, delete later
+	//	GTAGUI.generalMessage("SubFamilies: " + subFamilies); //testing only, delete later
 		
 		//create map Sku to SubFamily, also for each file
 		skuSubF = new HashMap<String, String>();
 		skuSubF = createSkuSubF(sheet1);
 	//	GTAGUI.generalMessage("Map SKU to SubFamily" +skuSubF);//testing only, delete later
 		
-		//create total/wk/subfamily, also for each file, but first builds header and last creates the .xls file
+		//create forecast/wk/subfamily, also for each file, but first file builds header and last file creates the .xls file
 		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
-		weeklyMapsSF = createSubFPerWeek( wks, wkRow0, sheet0);
+		weeklyMapsSF = createSubFPerWeek( wks, sheet0);
 		GTAGUI.generalMessage("Map qty by SubFamily" +weeklyMapsSF);//testing only, delete later
-		TemplateBuilder.createTemplate();
-		TemplateBuilder.FrcstByAccntBySubF(weeklyMapsSF, isFirst, isLast);
+		TemplateBuilder.FrcstByAccntBySubF(f2.getName(),weeklyMapsSF, isFirst, isLast);
 		
-		//create mix/wk/sku
-	/*	Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
+		//create mix/wk/sku, also for each file
+		weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
 		weeklyMapsSku = createMixPerWeek(wks, sheet1, wkRow0);
 		GTAGUI.generalMessage("Total Mix per Sku per week" + weeklyMapsSku);//testing only, delete later
-		TemplateBuilder.createMixTemplate(weeklyMapsSku);
-		*/
+		TemplateBuilder.createMixTemplate(f2.getName(), weeklyMapsSku, isFirst, isLast);
+		
+		//create forecast judged and create the .xls
+		TemplateBuilder.createTemplate(isFirst, isLast);
+		
 	}
 	
+	//Pure calculations start here
+	/**
+	 * 
+	 * @param wkRow0
+	 * @return
+	 */
 	public static int calcWeeks (Row wkRow0) {
 		int nwks = 0;
 		for (Cell c : wkRow0) {
@@ -140,13 +134,20 @@ public class GTAFunctions {
 		return nwks;
 	}
 	
-	public static Map<Integer, HashMap<String, Integer>> createSubFPerWeek(int wks, Row wkRow0, Sheet sheet0 ){
+	/**
+	 * 
+	 * @param wks
+	 * @param sheet0
+	 * @return
+	 */
+	public static Map<Integer, HashMap<String, Integer>> createSubFPerWeek(int wks, Sheet sheet0 ){
+		Row wkRow00 = sheet0.getRow(7);
 		Map<Integer, HashMap<String, Integer>> weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		int columnIndexSF = 0;
 		for (int w = 1; w < wks + 1; w++) {
 			Map<String, Integer> subFPerWk = new HashMap<String, Integer>();//create a new map for each wk
 			//find the column index of this wk
-			for (Cell d : wkRow0) {
+			for (Cell d : wkRow00) {
 				try {
 					if ((new Double(d.getNumericCellValue())).intValue() == w) {
 						columnIndexSF = d.getColumnIndex();
@@ -179,6 +180,13 @@ public class GTAFunctions {
 		return weeklyMapsSF;
 	}
 	
+	/**
+	 * 
+	 * @param wks
+	 * @param sheet1
+	 * @param wkRow0
+	 * @return
+	 */
 	public static Map<Integer, HashMap<String, Double>> createMixPerWeek(int wks, Sheet sheet1, Row wkRow0 ){
 		Row wkRow1 = sheet1.getRow(7);
 		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
@@ -218,7 +226,6 @@ public class GTAFunctions {
 					if (rw.getRowNum() > 6 && 
 							!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
 							rw.getCell(3).getStringCellValue().contains("PPM"))  {
-					//	skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(w).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 					}
 				} catch (NullPointerException e) {
@@ -236,6 +243,11 @@ public class GTAFunctions {
 		return weeklyMapsSku;
 	}
 	
+	/**
+	 * 
+	 * @param sheet1
+	 * @return
+	 */
 	public static Map<String, String> createSkuSubF(Sheet sheet1) {
 		Map<String, String> skuSubF = new HashMap<String, String>();
 		ArrayList<String> tempArray = new ArrayList<String>();
