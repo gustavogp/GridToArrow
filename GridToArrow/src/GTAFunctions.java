@@ -17,16 +17,32 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class GTAFunctions {
 	public static Map<String, String> skuSubF;
 	public static Map<Integer, HashMap<String, Integer>> weeklyMapsSF;
+	static int wks = 0;
 	
 	public static void countAndCheck(File inputPath) {
 		ArrayList<File> folderFiles = new ArrayList<File>();
-		File geo = null;
+	//	File geo = null;
+		boolean isFirst = true;
+		boolean isLast = false;
 		
 		for (File f : inputPath.listFiles()){
 			folderFiles.add(f);
 		}
 		
 		GTAGUI.generalMessage("Found " + (folderFiles.size()-1) + " files in folder " + inputPath.getName());
+		for (File f2 : folderFiles) {
+			if (!(f2.getName().contains("DS_Store"))){
+				GTAGUI.generalMessage(f2.getName() + ", Last Modified on " + (new Date(f2.lastModified())).toString());
+				if(folderFiles.indexOf(f2) == folderFiles.size()-1 ) {
+					isLast = true;
+				}
+				calculateMix(f2, isFirst, isLast);
+				isFirst = false;
+				
+			}
+		}
+		
+	/* testing a modified for{} above, but this one works fine	
 		for (File f2 : folderFiles) {
 			if (!(f2.getName().contains("DS_Store"))){
 				GTAGUI.generalMessage(f2.getName() + ", Last Modified on " + (new Date(f2.lastModified())).toString());
@@ -40,15 +56,16 @@ public class GTAFunctions {
 		} else {
 			calculateMix(geo);
 		}
+		*/
 	}
 	
-	public static void calculateMix(File geo){
+	public static void calculateMix(File f2, boolean isFirst, boolean isLast){
 		Workbook wb = new HSSFWorkbook();
 		Sheet sheet1 = null, sheet0 = null;
 		FileInputStream readStr = null;
 		
 		try {
-			readStr = new FileInputStream(geo);
+			readStr = new FileInputStream(f2);
 			wb = new HSSFWorkbook(readStr);
 			sheet0 = wb.getSheet("Product");
 			sheet1 = wb.getSheet("PPN");
@@ -60,13 +77,15 @@ public class GTAFunctions {
 		}
 		
 		Row wkRow0 = sheet0.getRow(7);
-		int wks = 0;
 		
-		//how many weeks in this quarter
-		wks = calcWeeks(wkRow0);
-		GTAGUI.generalMessage("Weeks in this quarter: " + wks);
+		//how many weeks in this quarter, check only once
+		if(isFirst) {
+			wks = calcWeeks(wkRow0);
+			GTAGUI.generalMessage("Weeks in this quarter: " + wks);
+		}
 		
-		// list subfamilies
+		
+		// list subfamilies, list this for each file
 		ArrayList<String> subFamilies = new ArrayList<String>();
 		for (Row r : sheet0) {
 			try {
@@ -84,23 +103,24 @@ public class GTAFunctions {
 		}
 		GTAGUI.generalMessage("SubFamilies: " + subFamilies); //testing only, delete later
 		
-		//create map Sku to SubFamily
+		//create map Sku to SubFamily, also for each file
 		skuSubF = new HashMap<String, String>();
 		skuSubF = createSkuSubF(sheet1);
 	//	GTAGUI.generalMessage("Map SKU to SubFamily" +skuSubF);//testing only, delete later
 		
-		//create total/wk/subfamily
+		//create total/wk/subfamily, also for each file, but first builds header and last creates the .xls file
 		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, wkRow0, sheet0);
 		GTAGUI.generalMessage("Map qty by SubFamily" +weeklyMapsSF);//testing only, delete later
 		TemplateBuilder.createTemplate();
+		TemplateBuilder.FrcstByAccntBySubF(weeklyMapsSF, isFirst, isLast);
 		
 		//create mix/wk/sku
-		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
+	/*	Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
 		weeklyMapsSku = createMixPerWeek(wks, sheet1, wkRow0);
 		GTAGUI.generalMessage("Total Mix per Sku per week" + weeklyMapsSku);//testing only, delete later
 		TemplateBuilder.createMixTemplate(weeklyMapsSku);
-		
+		*/
 	}
 	
 	public static int calcWeeks (Row wkRow0) {

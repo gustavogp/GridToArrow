@@ -18,11 +18,16 @@ public class TemplateBuilder {
 	static Calendar todayNow = Calendar.getInstance();
 	static Workbook wb = new HSSFWorkbook();
 	static Workbook wbMix = new HSSFWorkbook();
+	static Sheet sheetForByAcc = wb.createSheet("Forecast By Account");
 	static Sheet sheet1 = wb.createSheet("Forecast");
 	static Sheet sheetMix = wbMix.createSheet("Mix");
+	static FileOutputStream fileOut;
+	static int rCount2 = 0;
+	static int previousLastRow =0;
+	
 	
 	public static void createTemplate() {
-		FileOutputStream fileOut;
+	//	FileOutputStream fileOut;
 		CellStyle style1 = wb.createCellStyle();
 		CellStyle style2 = wb.createCellStyle();
 		CellStyle style3 = wb.createCellStyle();
@@ -101,7 +106,7 @@ public class TemplateBuilder {
 		
 		
 		//create and save the xls file
-		try {
+	/*	try {
 			fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/ForecastTemplate_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
 					String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
 			wb.write(fileOut);
@@ -113,7 +118,7 @@ public class TemplateBuilder {
 			e.printStackTrace();
 			GTAGUI.generalMessage("Error saving Template file" + e.getMessage());
 		} 
-		
+		*/
 	}
 	
 	public static void createMixTemplate(Map<Integer, HashMap<String, Double>> mixTemp) {
@@ -187,75 +192,78 @@ public class TemplateBuilder {
 				
 	}
 	
-	public static void FrcstByAccntBySubF(Map<Integer, HashMap<String, Double>> mixTemp) {
-		FileOutputStream fileOut;
-		int rCount = 0;
+	public static void FrcstByAccntBySubF(Map<Integer, HashMap<String, Integer>> weeklyMapsSF, boolean isFirst, boolean isLast) {
+	//	FileOutputStream fileOut;
+	//	int rCount = 0;
 		Row row;
 		
-		//create header
-				row = sheetMix.createRow(rCount);
-				rCount++;
-				row.createCell(0).setCellValue("Customer Name");
-				row.createCell(1).setCellValue("Apple Part Nr");
-				row.createCell(2).setCellValue("Date Updated");
-				row.createCell(3).setCellValue("Region Code");
-				row.createCell(4).setCellValue("Instock Percentage");
-				row.createCell(5).setCellValue("Store Count");
-				row.createCell(6).setCellValue("DC On Hand");
-				row.createCell(7).setCellValue("Target WOS");
-				row.createCell(8).setCellValue("Current Week Trend");
-				row.createCell(9).setCellValue("Forecast Quarter");
-				row.createCell(10).setCellValue("Week 1 Forecast");
-				row.createCell(11).setCellValue("Week 2 Forecast");
-				row.createCell(12).setCellValue("Week 3 Forecast");
-				row.createCell(13).setCellValue("Week 4 Forecast");
-				row.createCell(14).setCellValue("Week 5 Forecast");
-				row.createCell(15).setCellValue("Week 6 Forecast");
-				row.createCell(16).setCellValue("Week 7 Forecast");
-				row.createCell(17).setCellValue("Week 8 Forecast");
-				row.createCell(18).setCellValue("Week 9 Forecast");
-				row.createCell(19).setCellValue("Week 10 Forecast");
-				row.createCell(20).setCellValue("Week 11 Forecast");
-				row.createCell(21).setCellValue("Week 12 Forecast");
-				row.createCell(22).setCellValue("Week 13 Forecast");
-				row.createCell(23).setCellValue("Week 14 Forecast");
-				
-				//create SKU column
-				for(String k : mixTemp.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
-					row = sheetMix.createRow(rCount);
-					rCount++;
-					row.createCell(1).setCellValue(k);
-				}
-				//add mix data
-				for (int wk = 1; wk < mixTemp.size() + 1; wk++) {
-					try{
-						for(Row r : sheetMix) {
-							if (r.getRowNum() > 0) {
-								r.createCell(9 + wk).setCellValue(mixTemp.get(wk).get(r.getCell(1).getStringCellValue()));
-							}
-							
-						}
-					} catch (NullPointerException e) {
-						//e.printStackTrace();
+		//create header only if isFirst
+		if (isFirst) {
+			row = sheetForByAcc.createRow(rCount2);
+			rCount2++;
+			row.createCell(0).setCellValue("Customer Name");
+			row.createCell(1).setCellValue("Apple Part Nr");
+			row.createCell(2).setCellValue("Date Updated");
+			row.createCell(3).setCellValue("Region Code");
+			row.createCell(4).setCellValue("Instock Percentage");
+			row.createCell(5).setCellValue("Store Count");
+			row.createCell(6).setCellValue("DC On Hand");
+			row.createCell(7).setCellValue("Target WOS");
+			row.createCell(8).setCellValue("Current Week Trend");
+			row.createCell(9).setCellValue("Forecast Quarter");
+			row.createCell(10).setCellValue("Week 1 Forecast");
+			row.createCell(11).setCellValue("Week 2 Forecast");
+			row.createCell(12).setCellValue("Week 3 Forecast");
+			row.createCell(13).setCellValue("Week 4 Forecast");
+			row.createCell(14).setCellValue("Week 5 Forecast");
+			row.createCell(15).setCellValue("Week 6 Forecast");
+			row.createCell(16).setCellValue("Week 7 Forecast");
+			row.createCell(17).setCellValue("Week 8 Forecast");
+			row.createCell(18).setCellValue("Week 9 Forecast");
+			row.createCell(19).setCellValue("Week 10 Forecast");
+			row.createCell(20).setCellValue("Week 11 Forecast");
+			row.createCell(21).setCellValue("Week 12 Forecast");
+			row.createCell(22).setCellValue("Week 13 Forecast");
+			row.createCell(23).setCellValue("Week 14 Forecast");
+		}	
+		//create SubFamily column
+		for(String k : weeklyMapsSF.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
+			row = sheetForByAcc.createRow(rCount2);
+			row.createCell(1).setCellValue(k);
+			rCount2++;
+		}
+		//add mix data
+		for (int wk = 1; wk < weeklyMapsSF.size() + 1; wk++) {
+			try{
+				for(Row r : sheetForByAcc) {
+					if (r.getRowNum() > previousLastRow) {
+						r.createCell(9 + wk).setCellValue(weeklyMapsSF.get(wk).get(r.getCell(1).getStringCellValue()));
 					}
 					
 				}
-				
-				//create and save the xls file
-				try {
-					fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/ForecastMix_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
-							String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
-					wbMix.write(fileOut);
-					fileOut.close();
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-					GTAGUI.generalMessage("Error saving Template file: " + e.getMessage());
-				} catch (IOException e) {
-					e.printStackTrace();
-					GTAGUI.generalMessage("Error saving Template file" + e.getMessage());
-				}
-				
-				
+			} catch (NullPointerException e) {
+				//e.printStackTrace();
+			}
+			
+		}
+		//update the previousLastRow, subtract 1 since we had added 1 and didn't "use" the row yet
+		previousLastRow = rCount2 - 1;
+		
+		//create and save the xls file
+		if(isLast) {
+			try {
+				fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/Forecast_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
+						String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
+				wb.write(fileOut);
+				fileOut.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				GTAGUI.generalMessage("Error saving Template file: " + e.getMessage());
+			} catch (IOException e) {
+				e.printStackTrace();
+				GTAGUI.generalMessage("Error saving Template file" + e.getMessage());
+			}
+		}			
 	}
 	
 }
