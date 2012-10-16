@@ -40,6 +40,7 @@ public class TemplateBuilder {
 		
 		//create header only if isFirst
 		if (isFirst) {
+			
 			row = sheetForByAcc.createRow(rCountFBA);
 			rCountFBA++;
 			row.createCell(0).setCellValue("Customer Name");
@@ -66,6 +67,9 @@ public class TemplateBuilder {
 			row.createCell(21).setCellValue("Week 12 Forecast");
 			row.createCell(22).setCellValue("Week 13 Forecast");
 			row.createCell(23).setCellValue("Week 14 Forecast");
+			for( Cell c : row) {
+				sheetForByAcc.autoSizeColumn(c.getColumnIndex());
+			}
 		}	
 		//create SubFamily column
 		for(String k : weeklyMapsSF.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
@@ -151,6 +155,9 @@ public class TemplateBuilder {
 			row.createCell(21).setCellValue("Week 12 Actual");
 			row.createCell(22).setCellValue("Week 13 Actual");
 			row.createCell(23).setCellValue("Week 14 Actual");
+			for( Cell c : row) {
+				sheetMix.autoSizeColumn(c.getColumnIndex());
+			}
 		}
 		//create SKU column
 		for(String k : weeklyMapsSku.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
@@ -269,7 +276,9 @@ public class TemplateBuilder {
 		row.createCell(49).setCellValue("Week 12 Req");
 		row.createCell(50).setCellValue("Week 13 Req");
 		row.createCell(51).setCellValue("Week 14 Req");
-		
+		for( Cell c : row) {
+			sheet1.autoSizeColumn(c.getColumnIndex());
+		}
 		//for each account
 		
 			//create SKU column

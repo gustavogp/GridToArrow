@@ -49,7 +49,8 @@ public class GTAFunctions {
 		Workbook wb = new HSSFWorkbook();
 		Sheet sheet1 = null, sheet0 = null;
 		FileInputStream readStr = null;
-		
+		String name = f2.getName();
+		String subName = name.substring(name.indexOf(".")+1, name.lastIndexOf("."));
 		try {
 			readStr = new FileInputStream(f2);
 			wb = new HSSFWorkbook(readStr);
@@ -98,13 +99,13 @@ public class GTAFunctions {
 		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, sheet0);
 		GTAGUI.generalMessage("Map qty by SubFamily" +weeklyMapsSF);//testing only, delete later
-		TemplateBuilder.FrcstByAccntBySubF(f2.getName(),weeklyMapsSF, isFirst, isLast);
+		TemplateBuilder.FrcstByAccntBySubF(subName,weeklyMapsSF, isFirst, isLast);
 		
 		//create mix/wk/sku, also for each file
 		weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
 		weeklyMapsSku = createMixPerWeek(wks, sheet1, wkRow0);
 		GTAGUI.generalMessage("Total Mix per Sku per week" + weeklyMapsSku);//testing only, delete later
-		TemplateBuilder.createMixTemplate(f2.getName(), weeklyMapsSku, isFirst, isLast);
+		TemplateBuilder.createMixTemplate(subName, weeklyMapsSku, isFirst, isLast);
 		
 		//create forecast judged and create the .xls
 		TemplateBuilder.createTemplate(isFirst, isLast);
