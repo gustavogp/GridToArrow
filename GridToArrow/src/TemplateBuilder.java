@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -37,7 +38,7 @@ public class TemplateBuilder {
 	 * @param isFirst
 	 * @param isLast
 	 */
-	public static void FrcstByAccntBySubF(String name, Map<Integer, HashMap<String, Integer>> weeklyMapsSF, boolean isFirst, boolean isLast) {
+	public static void FrcstByAccntBySubF(String name, Map<Integer, TreeMap<String, Integer>> weeklyMapsSF, boolean isFirst, boolean isLast) {
 		Row row;
 		
 		//create header only if isFirst
@@ -98,7 +99,7 @@ public class TemplateBuilder {
 	 * Mix sheet, should be the second tab in the file. Should include column for CSA judgment
 	 * @param mixTemp
 	 */
-	public static void createMixTemplate(String name, Map<Integer, HashMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
+	public static void createMixTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		DataFormat df;
 		CellStyle percentageStyle, percentageStyle2;
@@ -236,7 +237,7 @@ public class TemplateBuilder {
 	/**
 	 * Forecast by account after CSAM judgment, should be the last (3rd) tab in the file
 	 */
-	public static void createTemplate(String name, Map<Integer, HashMap<String, Double>> weeklyMapsSku,boolean isFirst, boolean isLast) {
+	public static void createTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku,boolean isFirst, boolean isLast) {
 		Row row;
 		
 		CellStyle style1 = wb.createCellStyle();

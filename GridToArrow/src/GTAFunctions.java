@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -16,8 +17,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public class GTAFunctions {
 	public static Map<String, String> skuSubF;
-	public static Map<Integer, HashMap<String, Integer>> weeklyMapsSF;
-	public static Map<Integer, HashMap<String, Double>> weeklyMapsSku;
+	public static Map<Integer, TreeMap<String, Integer>> weeklyMapsSF;
+	public static Map<Integer, TreeMap<String, Double>> weeklyMapsSku;
 	static int wks = 0;
 	static Row wkRow0;
 	
@@ -96,13 +97,13 @@ public class GTAFunctions {
 	//	GTAGUI.generalMessage("Map SKU to SubFamily" +skuSubF);//testing only, delete later
 		
 		//create forecast/wk/subfamily, also for each file, but first file builds header and last file creates the .xls file
-		weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
+		weeklyMapsSF = new TreeMap<Integer, TreeMap<String, Integer>>();
 		weeklyMapsSF = createSubFPerWeek( wks, sheet0);
 		GTAGUI.generalMessage("Map qty by SubFamily" +weeklyMapsSF);//testing only, delete later
 		TemplateBuilder.FrcstByAccntBySubF(subName,weeklyMapsSF, isFirst, isLast);
 		
 		//create mix/wk/sku, also for each file
-		weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
+		weeklyMapsSku = new TreeMap<Integer, TreeMap<String, Double>>();
 		weeklyMapsSku = createMixPerWeek(wks, sheet1, wkRow0);
 		GTAGUI.generalMessage("Total Mix per Sku per week" + weeklyMapsSku);//testing only, delete later
 		TemplateBuilder.createMixTemplate(subName, weeklyMapsSku, isFirst, isLast);
@@ -141,12 +142,12 @@ public class GTAFunctions {
 	 * @param sheet0
 	 * @return
 	 */
-	public static Map<Integer, HashMap<String, Integer>> createSubFPerWeek(int wks, Sheet sheet0 ){
+	public static Map<Integer, TreeMap<String, Integer>> createSubFPerWeek(int wks, Sheet sheet0 ){
 		Row wkRow00 = sheet0.getRow(7);
-		Map<Integer, HashMap<String, Integer>> weeklyMapsSF = new HashMap<Integer, HashMap<String, Integer>>();
+		Map<Integer, TreeMap<String, Integer>> weeklyMapsSF = new TreeMap<Integer, TreeMap<String, Integer>>();
 		int columnIndexSF = 0;
 		for (int w = 1; w < wks + 1; w++) {
-			Map<String, Integer> subFPerWk = new HashMap<String, Integer>();//create a new map for each wk
+			Map<String, Integer> subFPerWk = new TreeMap<String, Integer>();//create a new map for each wk
 			//find the column index of this wk
 			for (Cell d : wkRow00) {
 				try {
@@ -176,7 +177,7 @@ public class GTAFunctions {
 				}
 				
 			}
-			weeklyMapsSF.put(w, (HashMap<String, Integer>) subFPerWk);
+			weeklyMapsSF.put(w, (TreeMap<String, Integer>) subFPerWk);
 		}
 		return weeklyMapsSF;
 	}
@@ -188,13 +189,13 @@ public class GTAFunctions {
 	 * @param wkRow0
 	 * @return
 	 */
-	public static Map<Integer, HashMap<String, Double>> createMixPerWeek(int wks, Sheet sheet1, Row wkRow0 ){
+	public static Map<Integer, TreeMap<String, Double>> createMixPerWeek(int wks, Sheet sheet1, Row wkRow0 ){
 		Row wkRow1 = sheet1.getRow(7);
-		Map<Integer, HashMap<String, Double>> weeklyMapsSku = new HashMap<Integer, HashMap<String, Double>>();
+		Map<Integer, TreeMap<String, Double>> weeklyMapsSku = new TreeMap<Integer, TreeMap<String, Double>>();
 		int columnIndexSku = 0;
 		int columnIndexSF =0;
 		for (int w = 1; w < wks + 1; w++) {
-			Map<String, Double> skuPerWk = new HashMap<String, Double>();//create a new map for each wk
+			Map<String, Double> skuPerWk = new TreeMap<String, Double>();//create a new map for each wk
 			//find the column index of this wk, for the SKU tab
 			for (Cell d : wkRow1) {
 				try {
@@ -239,7 +240,7 @@ public class GTAFunctions {
 				}
 				
 			}
-			weeklyMapsSku.put(w, (HashMap<String, Double>) skuPerWk);
+			weeklyMapsSku.put(w, (TreeMap<String, Double>) skuPerWk);
 		}
 		return weeklyMapsSku;
 	}
