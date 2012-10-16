@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
@@ -237,8 +238,19 @@ public class TemplateBuilder {
 	/**
 	 * Forecast by account after CSAM judgment, should be the last (3rd) tab in the file
 	 */
-	public static void createTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku,boolean isFirst, boolean isLast) {
+	public static void createTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
+		int firstRow, lastRow;
+		firstRow = 2;
+		lastRow = 33;
+		Cell c;
+		
+		DataFormat df;
+		CellStyle integ;
+		//create format styles
+		df = wb.createDataFormat();
+		integ = wb.createCellStyle();
+		integ.setDataFormat(df.getFormat("0"));
 		
 		CellStyle style1 = wb.createCellStyle();
 		CellStyle style2 = wb.createCellStyle();
@@ -257,7 +269,8 @@ public class TemplateBuilder {
 		
 		//create header
 	    if(isFirst) {
-	    	row = sheet1.createRow(0);
+	    	row = sheet1.createRow(rCountFore);
+	    	rCountFore++;
 			row.createCell(0).setCellValue("Customer Name");
 			row.createCell(1).setCellValue("Apple Part Nr");
 			row.createCell(2).setCellValue("Date Updated");
@@ -310,8 +323,8 @@ public class TemplateBuilder {
 			row.createCell(48).setCellValue("Week 12 Req");
 			row.createCell(49).setCellValue("Week 13 Req");
 			row.createCell(50).setCellValue("Week 14 Req");
-			for( Cell c : row) {
-				sheet1.autoSizeColumn(c.getColumnIndex());
+			for( Cell c1 : row) {
+				sheet1.autoSizeColumn(c1.getColumnIndex());
 			}
 	    }
 		
@@ -330,12 +343,102 @@ public class TemplateBuilder {
 					if (r.getRowNum() > previousLastRowFore) {
 						String subF = GTAFunctions.skuSubF.get(r.getCell(1).getStringCellValue());
 						
+						switch ( wk) {
+						case 1: String formula1 = "Mix!E" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+							c = r.createCell(24);
+							c.setCellFormula(formula1);
+							c.setCellStyle(integ);
+							break;
+						
+						case 2: String formula2 = "Mix!H" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(25);
+						c.setCellFormula(formula2);
+						c.setCellStyle(integ);
+						break;
+						
+						case 3: String formula3 = "Mix!K" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(26);
+						c.setCellFormula(formula3);
+						c.setCellStyle(integ);
+						break;
+						
+						case 4: String formula4 = "Mix!N" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(27);
+						c.setCellFormula(formula4);
+						c.setCellStyle(integ);
+						break;
+						
+						case 5: String formula5 = "Mix!Q" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(28);
+						c.setCellFormula(formula5);
+						c.setCellStyle(integ);
+						break;
+						
+						case 6: String formula6 = "Mix!T" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(29);
+						c.setCellFormula(formula6);
+						c.setCellStyle(integ);
+						break;
+						
+						case 7: String formula7 = "Mix!W" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(30);
+						c.setCellFormula(formula7);
+						c.setCellStyle(integ);
+						break;
+						
+						case 8: String formula8 = "Mix!Z" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(31);
+						c.setCellFormula(formula8);
+						c.setCellStyle(integ);
+						break;
+						
+						case 9: String formula9 = "Mix!AC" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(32);
+						c.setCellFormula(formula9);
+						c.setCellStyle(integ);
+						break;
+						
+						case 10: String formula10 = "Mix!AF" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(33);
+						c.setCellFormula(formula10);
+						c.setCellStyle(integ);
+						break;
+						
+						case 11: String formula11 = "Mix!AI" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(34);
+						c.setCellFormula(formula11);
+						c.setCellStyle(integ);
+						break;
+						
+						case 12: String formula12 = "Mix!AL" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(35);
+						c.setCellFormula(formula12);
+						c.setCellStyle(integ);
+						break;
+						
+						case 13: String formula13 = "Mix!AO" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(36);
+						c.setCellFormula(formula13);
+						c.setCellStyle(integ);
+						break;
+						
+						case 14: String formula14 = "Mix!AR" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						c = r.createCell(37);
+						c.setCellFormula(formula14);
+						c.setCellStyle(integ);
+						break;
+					}
 					}
 				}
 			} catch (NullPointerException e) {
 				
+			} catch (FormulaParseException e) {
+				
 			}
 		}
+		//freeze panes and re-autosize this column after adding content
+		sheet1.autoSizeColumn(1);
+		sheet1.createFreezePane(2, 1);
 		
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
 		previousLastRowFore = rCountFore - 1;

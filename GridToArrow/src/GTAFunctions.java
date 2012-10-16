@@ -109,7 +109,7 @@ public class GTAFunctions {
 		TemplateBuilder.createMixTemplate(subName, weeklyMapsSku, isFirst, isLast);
 		
 		//create forecast judged and create the .xls
-		TemplateBuilder.createTemplate(subName, weeklyMapsSku,isFirst, isLast);
+		TemplateBuilder.createTemplate(subName, weeklyMapsSku, isFirst, isLast);
 		
 	}
 	
