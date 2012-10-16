@@ -28,6 +28,7 @@ public class TemplateBuilder {
 	static FileOutputStream fileOut;
 	static int rCountFBA = 0;
 	static int previousLastRow = 0;
+	static int oldPreviousLastRow = 0;
 	static int rCountMix = 0;
 	static int previousLastRowMix = 1;
 	static int rCountFore = 0;
@@ -92,6 +93,7 @@ public class TemplateBuilder {
 		sheetForByAcc.autoSizeColumn(1); //re-autosize this column after adding content
 		
 		//update the previousLastRow, subtract 1 since we had added 1 and didn't "use" the row yet
+		oldPreviousLastRow = previousLastRow;
 		previousLastRow = rCountFBA - 1;
 			
 	}
@@ -241,8 +243,15 @@ public class TemplateBuilder {
 	public static void createTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		int firstRow, lastRow;
-		firstRow = 2;
-		lastRow = 33;
+		
+		//set firstRow, note that we refer to the Forecast By Account sheet (previousLastRow)
+		if(isFirst) {
+			firstRow = 2;
+		} else {
+			firstRow = oldPreviousLastRow + 2; //we don't want 0 based here
+		}
+		
+		lastRow = previousLastRow + 1; //we don't want 0 based here
 		Cell c;
 		
 		DataFormat df;
