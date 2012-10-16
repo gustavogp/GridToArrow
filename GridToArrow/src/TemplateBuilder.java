@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,7 +28,8 @@ public class TemplateBuilder {
 	static int previousLastRow = 0;
 	static int rCountMix = 0;
 	static int previousLastRowMix = 1;
-	
+	static int rCountFore = 0;
+	static int previousLastRowFore = 0;
 	
 	/**
 	 * Forecast by account BEFORE CSAM judgment, should be the first tab in the file
@@ -236,7 +236,9 @@ public class TemplateBuilder {
 	/**
 	 * Forecast by account after CSAM judgment, should be the last (3rd) tab in the file
 	 */
-	public static void createTemplate(boolean isFirst, boolean isLast) {
+	public static void createTemplate(String name, Map<Integer, HashMap<String, Double>> weeklyMapsSku,boolean isFirst, boolean isLast) {
+		Row row;
+		
 		CellStyle style1 = wb.createCellStyle();
 		CellStyle style2 = wb.createCellStyle();
 		CellStyle style3 = wb.createCellStyle();
@@ -253,72 +255,93 @@ public class TemplateBuilder {
 	    style4.setFillPattern(CellStyle.SOLID_FOREGROUND);
 		
 		//create header
-		Row row = sheet1.createRow(0);
-		row.createCell(0).setCellValue("Customer Name");
-		row.createCell(1).setCellValue("Apple Part Nr");
-		row.createCell(2).setCellValue("Date Updated");
-		row.createCell(3).setCellValue("Region Code");
-		row.createCell(4).setCellValue("Instock Percentage");
-		row.createCell(5).setCellValue("Store Count");
-		row.createCell(6).setCellValue("DC On Hand");
-		row.createCell(7).setCellValue("Target WOS");
-		row.createCell(8).setCellValue("Current Week Trend");
-		row.createCell(9).setCellValue("Forecast Quarter");
-		row.createCell(10).setCellValue("Week 1 Forecast");
-		row.createCell(11).setCellValue("Week 2 Forecast");
-		row.createCell(12).setCellValue("Week 3 Forecast");
-		row.createCell(13).setCellValue("Week 4 Forecast");
-		row.createCell(14).setCellValue("Week 5 Forecast");
-		row.createCell(15).setCellValue("Week 6 Forecast");
-		row.createCell(16).setCellValue("Week 7 Forecast");
-		row.createCell(17).setCellValue("Week 8 Forecast");
-		row.createCell(18).setCellValue("Week 9 Forecast");
-		row.createCell(19).setCellValue("Week 10 Forecast");
-		row.createCell(20).setCellValue("Week 11 Forecast");
-		row.createCell(21).setCellValue("Week 12 Forecast");
-		row.createCell(22).setCellValue("Week 13 Forecast");
-		row.createCell(23).setCellValue("Week 14 Forecast");
-		row.createCell(24).setCellValue("Week 1 JST");
-		row.createCell(25).setCellValue("Week 2 JST");
-		row.createCell(26).setCellValue("Week 3 JST");
-		row.createCell(27).setCellValue("Week 4 JST");
-		row.createCell(28).setCellValue("Week 5 JST");
-		row.createCell(29).setCellValue("Week 6 JST");
-		row.createCell(30).setCellValue("Week 7 JST");
-		row.createCell(31).setCellValue("Week 8 JST");
-		row.createCell(32).setCellValue("Week 9 JST");
-		row.createCell(33).setCellValue("Week 10 JST");
-		row.createCell(34).setCellValue("Week 11 JST");
-		row.createCell(35).setCellValue("Week 12 JST");
-		row.createCell(35).setCellValue("Week 13 JST");
-		row.createCell(37).setCellValue("Week 14 JST");
-		row.createCell(38).setCellValue("Week 1 Req");
-		row.createCell(39).setCellValue("Week 2 Req");
-		row.createCell(40).setCellValue("Week 3 Req");
-		row.createCell(41).setCellValue("Week 4 Req");
-		row.createCell(42).setCellValue("Week 5 Req");
-		row.createCell(43).setCellValue("Week 6 Req");
-		row.createCell(44).setCellValue("Week 7 Req");
-		row.createCell(45).setCellValue("Week 8 Req");
-		row.createCell(46).setCellValue("Week 9 Req");
-		row.createCell(47).setCellValue("Week 10 Req");
-		row.createCell(48).setCellValue("Week 11 Req");
-		row.createCell(49).setCellValue("Week 12 Req");
-		row.createCell(50).setCellValue("Week 13 Req");
-		row.createCell(51).setCellValue("Week 14 Req");
-		for( Cell c : row) {
-			sheet1.autoSizeColumn(c.getColumnIndex());
+	    if(isFirst) {
+	    	row = sheet1.createRow(0);
+			row.createCell(0).setCellValue("Customer Name");
+			row.createCell(1).setCellValue("Apple Part Nr");
+			row.createCell(2).setCellValue("Date Updated");
+			row.createCell(3).setCellValue("Region Code");
+			row.createCell(4).setCellValue("Instock Percentage");
+			row.createCell(5).setCellValue("Store Count");
+			row.createCell(6).setCellValue("DC On Hand");
+			row.createCell(7).setCellValue("Target WOS");
+			row.createCell(8).setCellValue("Current Week Trend");
+			row.createCell(9).setCellValue("Forecast Quarter");
+			row.createCell(10).setCellValue("Week 1 Forecast");
+			row.createCell(11).setCellValue("Week 2 Forecast");
+			row.createCell(12).setCellValue("Week 3 Forecast");
+			row.createCell(13).setCellValue("Week 4 Forecast");
+			row.createCell(14).setCellValue("Week 5 Forecast");
+			row.createCell(15).setCellValue("Week 6 Forecast");
+			row.createCell(16).setCellValue("Week 7 Forecast");
+			row.createCell(17).setCellValue("Week 8 Forecast");
+			row.createCell(18).setCellValue("Week 9 Forecast");
+			row.createCell(19).setCellValue("Week 10 Forecast");
+			row.createCell(20).setCellValue("Week 11 Forecast");
+			row.createCell(21).setCellValue("Week 12 Forecast");
+			row.createCell(22).setCellValue("Week 13 Forecast");
+			row.createCell(23).setCellValue("Week 14 Forecast");
+			row.createCell(24).setCellValue("Week 1 JST");
+			row.createCell(25).setCellValue("Week 2 JST");
+			row.createCell(26).setCellValue("Week 3 JST");
+			row.createCell(27).setCellValue("Week 4 JST");
+			row.createCell(28).setCellValue("Week 5 JST");
+			row.createCell(29).setCellValue("Week 6 JST");
+			row.createCell(30).setCellValue("Week 7 JST");
+			row.createCell(31).setCellValue("Week 8 JST");
+			row.createCell(32).setCellValue("Week 9 JST");
+			row.createCell(33).setCellValue("Week 10 JST");
+			row.createCell(34).setCellValue("Week 11 JST");
+			row.createCell(35).setCellValue("Week 12 JST");
+			row.createCell(35).setCellValue("Week 13 JST");
+			row.createCell(36).setCellValue("Week 14 JST");
+			row.createCell(37).setCellValue("Week 1 Req");
+			row.createCell(38).setCellValue("Week 2 Req");
+			row.createCell(39).setCellValue("Week 3 Req");
+			row.createCell(40).setCellValue("Week 4 Req");
+			row.createCell(41).setCellValue("Week 5 Req");
+			row.createCell(42).setCellValue("Week 6 Req");
+			row.createCell(43).setCellValue("Week 7 Req");
+			row.createCell(44).setCellValue("Week 8 Req");
+			row.createCell(45).setCellValue("Week 9 Req");
+			row.createCell(46).setCellValue("Week 10 Req");
+			row.createCell(47).setCellValue("Week 11 Req");
+			row.createCell(48).setCellValue("Week 12 Req");
+			row.createCell(49).setCellValue("Week 13 Req");
+			row.createCell(50).setCellValue("Week 14 Req");
+			for( Cell c : row) {
+				sheet1.autoSizeColumn(c.getColumnIndex());
+			}
+	    }
+		
+		//create SKU column
+				for(String k : weeklyMapsSku.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
+					row = sheet1.createRow(rCountFore);
+					row.createCell(0).setCellValue(name);
+					row.createCell(1).setCellValue(k);
+					rCountFore++;
+				}
+		
+		//add mix*subFforecast
+		for (int wk = 1; wk < weeklyMapsSku.size() + 1; wk++) {
+			try{
+				for(Row r : sheet1) {
+					if (r.getRowNum() > previousLastRowFore) {
+						String subF = GTAFunctions.skuSubF.get(r.getCell(1).getStringCellValue());
+						
+					}
+				}
+			} catch (NullPointerException e) {
+				
+			}
 		}
-		//for each account
 		
-			//create SKU column
-		
-			//add mix/*subFforecast
-		
+		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
+		previousLastRowFore = rCountFore - 1;
 		
 		//create and save the xls file
 		if(isLast) {
-			sheetMix.setSelected(true);
+			wb.setActiveSheet(1);
 			try {
 				fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/ForecastMix_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
 						String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
