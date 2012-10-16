@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 
 public class TemplateBuilder {
@@ -24,9 +26,9 @@ public class TemplateBuilder {
 	static Sheet sheet1 = wb.createSheet("Judged Forecast");
 	static FileOutputStream fileOut;
 	static int rCountFBA = 0;
-	static int previousLastRow =0;
+	static int previousLastRow = 0;
 	static int rCountMix = 0;
-	static int previousLastRowMix =0;
+	static int previousLastRowMix = 1;
 	
 	
 	/**
@@ -45,28 +47,20 @@ public class TemplateBuilder {
 			rCountFBA++;
 			row.createCell(0).setCellValue("Customer Name");
 			row.createCell(1).setCellValue("Apple Part Nr");
-			row.createCell(2).setCellValue("Date Updated");
-			row.createCell(3).setCellValue("Region Code");
-			row.createCell(4).setCellValue("Instock Percentage");
-			row.createCell(5).setCellValue("Store Count");
-			row.createCell(6).setCellValue("DC On Hand");
-			row.createCell(7).setCellValue("Target WOS");
-			row.createCell(8).setCellValue("Current Week Trend");
-			row.createCell(9).setCellValue("Forecast Quarter");
-			row.createCell(10).setCellValue("Week 1 Forecast");
-			row.createCell(11).setCellValue("Week 2 Forecast");
-			row.createCell(12).setCellValue("Week 3 Forecast");
-			row.createCell(13).setCellValue("Week 4 Forecast");
-			row.createCell(14).setCellValue("Week 5 Forecast");
-			row.createCell(15).setCellValue("Week 6 Forecast");
-			row.createCell(16).setCellValue("Week 7 Forecast");
-			row.createCell(17).setCellValue("Week 8 Forecast");
-			row.createCell(18).setCellValue("Week 9 Forecast");
-			row.createCell(19).setCellValue("Week 10 Forecast");
-			row.createCell(20).setCellValue("Week 11 Forecast");
-			row.createCell(21).setCellValue("Week 12 Forecast");
-			row.createCell(22).setCellValue("Week 13 Forecast");
-			row.createCell(23).setCellValue("Week 14 Forecast");
+			row.createCell(2).setCellValue("Week 1 Forecast");
+			row.createCell(3).setCellValue("Week 2 Forecast");
+			row.createCell(4).setCellValue("Week 3 Forecast");
+			row.createCell(5).setCellValue("Week 4 Forecast");
+			row.createCell(6).setCellValue("Week 5 Forecast");
+			row.createCell(7).setCellValue("Week 6 Forecast");
+			row.createCell(8).setCellValue("Week 7 Forecast");
+			row.createCell(9).setCellValue("Week 8 Forecast");
+			row.createCell(10).setCellValue("Week 9 Forecast");
+			row.createCell(11).setCellValue("Week 10 Forecast");
+			row.createCell(12).setCellValue("Week 11 Forecast");
+			row.createCell(13).setCellValue("Week 12 Forecast");
+			row.createCell(14).setCellValue("Week 13 Forecast");
+			row.createCell(15).setCellValue("Week 14 Forecast");
 			for( Cell c : row) {
 				sheetForByAcc.autoSizeColumn(c.getColumnIndex());
 			}
@@ -83,7 +77,7 @@ public class TemplateBuilder {
 			try{
 				for(Row r : sheetForByAcc) {
 					if (r.getRowNum() > previousLastRow) {
-						r.createCell(9 + wk).setCellValue(weeklyMapsSF.get(wk).get(r.getCell(1).getStringCellValue()));
+						r.createCell(1 + wk).setCellValue(weeklyMapsSF.get(wk).get(r.getCell(1).getStringCellValue()));
 					}
 					
 				}
@@ -92,25 +86,12 @@ public class TemplateBuilder {
 			}
 			
 		}
+		
+		sheetForByAcc.autoSizeColumn(1); //re-autosize this column after adding content
+		
 		//update the previousLastRow, subtract 1 since we had added 1 and didn't "use" the row yet
 		previousLastRow = rCountFBA - 1;
-		
-		//create and save the xls file
-	/*	if(isLast) {
-			try {
-				fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/Forecast_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
-						String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
-				wb.write(fileOut);
-				fileOut.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				GTAGUI.generalMessage("Error saving Template file: " + e.getMessage());
-			} catch (IOException e) {
-				e.printStackTrace();
-				GTAGUI.generalMessage("Error saving Template file" + e.getMessage());
-			}
-		}	
-		*/		
+			
 	}
 	
 	/**
@@ -120,43 +101,62 @@ public class TemplateBuilder {
 	public static void createMixTemplate(String name, Map<Integer, HashMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		DataFormat df;
-		CellStyle percentageStyle;
+		CellStyle percentageStyle, percentageStyle2;
 		
-		//create format style
+		//create format styles
 		df = wb.createDataFormat();
 		percentageStyle = wb.createCellStyle();
 		percentageStyle.setDataFormat(df.getFormat("0.00%"));
 		
-		//create header
+		percentageStyle2 = wb.createCellStyle();
+		percentageStyle2.setDataFormat(df.getFormat("0.00%"));
+		percentageStyle2.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
+		percentageStyle2.setFillPattern(CellStyle.SOLID_FOREGROUND);
+		percentageStyle2.setBorderRight(CellStyle.BORDER_THICK);
+		
+		//create header, merge header cells, add row bellow header (subheader)
 		if(isFirst) {
 			row = sheetMix.createRow(rCountMix);
 			rCountMix++;
 			row.createCell(0).setCellValue("Customer Name");
 			row.createCell(1).setCellValue("Apple Part Nr");
-			row.createCell(2).setCellValue("Date Updated");
-			row.createCell(3).setCellValue("Region Code");
-			row.createCell(4).setCellValue("Instock Percentage");
-			row.createCell(5).setCellValue("Store Count");
-			row.createCell(6).setCellValue("DC On Hand");
-			row.createCell(7).setCellValue("Target WOS");
-			row.createCell(8).setCellValue("Current Week Trend");
-			row.createCell(9).setCellValue("Forecast Quarter");
-			row.createCell(10).setCellValue("Week 1 Actual");
-			row.createCell(11).setCellValue("Week 2 Actual");
-			row.createCell(12).setCellValue("Week 3 Actual");
-			row.createCell(13).setCellValue("Week 4 Actual");
-			row.createCell(14).setCellValue("Week 5 Actual");
-			row.createCell(15).setCellValue("Week 6 Actual");
-			row.createCell(16).setCellValue("Week 7 Actual");
-			row.createCell(17).setCellValue("Week 8 Actual");
-			row.createCell(18).setCellValue("Week 9 Actual");
-			row.createCell(19).setCellValue("Week 10 Actual");
-			row.createCell(20).setCellValue("Week 11 Actual");
-			row.createCell(21).setCellValue("Week 12 Actual");
-			row.createCell(22).setCellValue("Week 13 Actual");
-			row.createCell(23).setCellValue("Week 14 Actual");
+			row.createCell(2).setCellValue("Week 1");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 2, 4));
+			row.createCell(5).setCellValue("Week 2");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 5, 7));
+			row.createCell(8).setCellValue("Week 3");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 8, 10));
+			row.createCell(11).setCellValue("Week 4");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 11, 13));
+			row.createCell(14).setCellValue("Week 5");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 14, 16));
+			row.createCell(17).setCellValue("Week 6");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 17, 19));
+			row.createCell(20).setCellValue("Week 7");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 20, 22));
+			row.createCell(23).setCellValue("Week 8");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 23, 25));
+			row.createCell(26).setCellValue("Week 9");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 26, 28));
+			row.createCell(29).setCellValue("Week 10");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 29, 31));
+			row.createCell(32).setCellValue("Week 11");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 32, 34));
+			row.createCell(35).setCellValue("Week 12");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 35, 37));
+			row.createCell(38).setCellValue("Week 13");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 38, 40));
+			row.createCell(41).setCellValue("Week 14");
+			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 41, 43));
 			for( Cell c : row) {
 				sheetMix.autoSizeColumn(c.getColumnIndex());
+			}
+			row = sheetMix.createRow(rCountMix);
+			rCountMix++;
+			for(int wk = 1 ; wk < 15 ; wk++) {
+				row.createCell(2 + (wk - 1)*3).setCellValue("Actual");
+				row.createCell(3 + (wk - 1)*3).setCellValue("AVG 5 wks");
+				row.createCell(4 + (wk - 1)*3).setCellValue("Judged");
 			}
 		}
 		//create SKU column
@@ -171,36 +171,66 @@ public class TemplateBuilder {
 			try{
 				for(Row r : sheetMix) {
 					if (r.getRowNum() > previousLastRowMix) {
-						Cell c = r.createCell(9 + wk);
+						Cell c = r.createCell(2 + (wk-1)*3);
 						c.setCellValue(weeklyMapsSku.get(wk).get(r.getCell(1).getStringCellValue()));
 						c.setCellStyle(percentageStyle);
-					//	r.createCell(9 + wk).setCellValue(weeklyMapsSku.get(wk).get(r.getCell(1).getStringCellValue()));
+						
+						//calculate averages
+						c =r.createCell(3 + (wk - 1)*3);
+						try {
+							if(wk < 6) {
+								double soma = 0;
+								for (int n = 1; n < wk + 1; n++) {
+									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								}
+								c.setCellValue(soma/wk);
+							} else {
+								double soma = 0;
+								for (int n = wk - 4; n < wk + 1; n++) {
+									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								}
+								c.setCellValue(soma/5);
+							}
+						} catch (IllegalStateException e) {
+							c.setCellValue(0);
+						}
+						c.setCellStyle(percentageStyle);
+						
+						//Judged values = averages
+						c =r.createCell(4 + (wk - 1)*3);
+						try {
+							if(wk < 6) {
+								double soma = 0;
+								for (int n = 1; n < wk + 1; n++) {
+									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								}
+								c.setCellValue(soma/wk);
+							} else {
+								double soma = 0;
+								for (int n = wk - 4; n < wk + 1; n++) {
+									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								}
+								c.setCellValue(soma/5);
+							}
+						} catch (IllegalStateException e) {
+							c.setCellValue(0);
+						}
+						c.setCellStyle(percentageStyle2);
+						
+						
 					}
 				}
 			} catch (NullPointerException e) {
 				//e.printStackTrace();
-			}
+			} 
 		}
+		//freeze panes
+		sheetMix.autoSizeColumn(1); //re-autosize this column after adding content
+		sheetMix.createFreezePane(2, 2);
 				
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
 		previousLastRowMix = rCountMix - 1;
-				
-		//create and save the xls file
-	/*	if(isLast) {
-			try {
-				fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/ForecastMix_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
-						String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
-				wb.write(fileOut);
-				fileOut.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				GTAGUI.generalMessage("Error saving Template file: " + e.getMessage());
-			} catch (IOException e) {
-				e.printStackTrace();
-				GTAGUI.generalMessage("Error saving Template file" + e.getMessage());
-			}
-		}
-		*/		
+		
 	}
 	
 	/**
@@ -288,6 +318,7 @@ public class TemplateBuilder {
 		
 		//create and save the xls file
 		if(isLast) {
+			sheetMix.setSelected(true);
 			try {
 				fileOut = new FileOutputStream(GTAGUI.inputPath.getParent() + "/ForecastMix_" + String.valueOf((todayNow.get(Calendar.MONTH)+1)) + String.valueOf(todayNow.get(Calendar.DAY_OF_MONTH)) + 
 						String.valueOf(todayNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(todayNow.get(Calendar.MINUTE)) + ".xls");
