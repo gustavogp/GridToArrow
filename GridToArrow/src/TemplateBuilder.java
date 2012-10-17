@@ -2,7 +2,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -159,7 +158,11 @@ public class TemplateBuilder {
 			rCountMix++;
 			for(int wk = 1 ; wk < 15 ; wk++) {
 				row.createCell(2 + (wk - 1)*3).setCellValue("Actual");
-				row.createCell(3 + (wk - 1)*3).setCellValue("AVG 5 wks");
+				if( wk < 5) {
+					row.createCell(3 + (wk - 1)*3).setCellValue("AVG " + wk + " wks");
+				} else {
+					row.createCell(3 + (wk - 1)*3).setCellValue("AVG 5 wks");
+				}
 				row.createCell(4 + (wk - 1)*3).setCellValue("Judged");
 			}
 		}
