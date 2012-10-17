@@ -450,7 +450,7 @@ public class TemplateBuilder {
 		}
 		//freeze panes and re-autosize this column after adding content
 		sheet1.autoSizeColumn(1);
-		sheet1.createFreezePane(2, 1);
+		sheet1.createFreezePane(2, 1, 22, 1);
 		
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
 		previousLastRowFore = rCountFore - 1;
