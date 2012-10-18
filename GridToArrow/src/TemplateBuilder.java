@@ -178,6 +178,7 @@ public class TemplateBuilder {
 			try{
 				for(Row r : sheetMix) {
 					if (r.getRowNum() > previousLastRowMix) {
+						//Actual values
 						Cell c = r.createCell(2 + (wk-1)*3);
 						c.setCellValue(weeklyMapsSku.get(wk).get(r.getCell(1).getStringCellValue()));
 						c.setCellStyle(percentageStyle);

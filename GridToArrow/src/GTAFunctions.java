@@ -228,14 +228,19 @@ public class GTAFunctions {
 					if (rw.getRowNum() > 6 && 
 							!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
 							rw.getCell(3).getStringCellValue().contains("PPM"))  {
-						skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
+						//for some reason we are not catching the /0, here's the workaround
+						if((weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) == 0) {
+							skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
+						} else {
+							skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
+						}
 					}
 				} catch (NullPointerException e) {
 				//	e.printStackTrace();
 				} catch (IllegalStateException e) {
 				//	e.printStackTrace();
 				} catch (ArithmeticException e) {
-//				//  e.printStackTrace();
+				//  e.printStackTrace();
 					skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
 				}
 				
