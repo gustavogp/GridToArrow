@@ -63,9 +63,6 @@ public class TemplateBuilder {
 			row.createCell(13).setCellValue("Week 12 Forecast");
 			row.createCell(14).setCellValue("Week 13 Forecast");
 			row.createCell(15).setCellValue("Week 14 Forecast");
-			for( Cell c : row) {
-				sheetForByAcc.autoSizeColumn(c.getColumnIndex());
-			}
 		}	
 		//create SubFamily column
 		for(String k : weeklyMapsSF.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
@@ -89,7 +86,9 @@ public class TemplateBuilder {
 			
 		}
 		
-		sheetForByAcc.autoSizeColumn(1); //re-autosize this column after adding content
+		for( Cell c : sheetForByAcc.getRow(2)) {
+			sheetForByAcc.autoSizeColumn(c.getColumnIndex());
+		}
 		
 		//update the previousLastRow, subtract 1 since we had added 1 and didn't "use" the row yet
 		oldPreviousLastRow = previousLastRow;
@@ -151,19 +150,18 @@ public class TemplateBuilder {
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 38, 40));
 			row.createCell(41).setCellValue("Week 14");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 41, 43));
-			for( Cell c : row) {
-				sheetMix.autoSizeColumn(c.getColumnIndex());
-			}
 			row = sheetMix.createRow(rCountMix);
 			rCountMix++;
 			for(int wk = 1 ; wk < 15 ; wk++) {
-				row.createCell(2 + (wk - 1)*3).setCellValue("Actual");
-				if( wk < 5) {
-					row.createCell(3 + (wk - 1)*3).setCellValue("AVG " + wk + " wks");
+				row.createCell(2 + (wk - 1)*3).setCellValue("Actual wk " + wk);
+				if( wk < 3) {
+					row.createCell(3 + (wk - 1)*3).setCellValue("Prev. N.A.");
+				} else if( wk < 8) {
+					row.createCell(3 + (wk - 1)*3).setCellValue("AVG wks 1-" + (wk-2));
 				} else {
-					row.createCell(3 + (wk - 1)*3).setCellValue("AVG 5 wks");
+					row.createCell(3 + (wk - 1)*3).setCellValue("AVG wks" + (wk-6) + "-" + (wk-2));
 				}
-				row.createCell(4 + (wk - 1)*3).setCellValue("Judged");
+				row.createCell(4 + (wk - 1)*3).setCellValue("Judged wk" + wk);
 			}
 		}
 		//create SKU column
@@ -186,15 +184,17 @@ public class TemplateBuilder {
 						//calculate averages
 						c =r.createCell(3 + (wk - 1)*3);
 						try {
-							if(wk < 6) {
+							if(wk < 3) {
+								c.setCellValue("");
+							} else if(wk < 8) {
 								double soma = 0;
-								for (int n = 1; n < wk + 1; n++) {
+								for (int n = 1; n < wk - 1; n++) {
 									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
 								}
-								c.setCellValue(soma/wk);
+								c.setCellValue(soma/(wk - 2));
 							} else {
 								double soma = 0;
-								for (int n = wk - 4; n < wk + 1; n++) {
+								for (int n = wk - 6; n < wk - 1; n++) {
 									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
 								}
 								c.setCellValue(soma/5);
@@ -207,15 +207,17 @@ public class TemplateBuilder {
 						//Judged values = averages
 						c =r.createCell(4 + (wk - 1)*3);
 						try {
-							if(wk < 6) {
+							if(wk < 3) {
+								c.setCellValue("");
+							} else if(wk < 8) {
 								double soma = 0;
-								for (int n = 1; n < wk + 1; n++) {
+								for (int n = 1; n < wk - 1; n++) {
 									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
 								}
-								c.setCellValue(soma/wk);
+								c.setCellValue(soma/(wk - 2));
 							} else {
 								double soma = 0;
-								for (int n = wk - 4; n < wk + 1; n++) {
+								for (int n = wk - 6; n < wk - 1; n++) {
 									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
 								}
 								c.setCellValue(soma/5);
@@ -232,8 +234,10 @@ public class TemplateBuilder {
 				//e.printStackTrace();
 			} 
 		}
-		//freeze panes
-		sheetMix.autoSizeColumn(1); //re-autosize this column after adding content
+		//auto size columns and freeze panes
+		for( Cell c : sheetMix.getRow(2)) {
+			sheetMix.autoSizeColumn(c.getColumnIndex());
+		}
 		sheetMix.createFreezePane(2, 2);
 				
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
@@ -336,9 +340,6 @@ public class TemplateBuilder {
 			row.createCell(48).setCellValue("Week 12 Req");
 			row.createCell(49).setCellValue("Week 13 Req");
 			row.createCell(50).setCellValue("Week 14 Req");
-			for( Cell c1 : row) {
-				sheet1.autoSizeColumn(c1.getColumnIndex());
-			}
 	    }
 		
 		//create SKU column
@@ -450,7 +451,9 @@ public class TemplateBuilder {
 			}
 		}
 		//freeze panes and re-autosize this column after adding content
-		sheet1.autoSizeColumn(1);
+		for( Cell c2 : sheet1.getRow(2)) {
+			sheet1.autoSizeColumn(c2.getColumnIndex());
+		}
 		sheet1.createFreezePane(2, 1, 22, 1);
 		
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
