@@ -2,8 +2,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.formula.FormulaParseException;
@@ -39,7 +39,7 @@ public class TemplateBuilder {
 	 * @param isFirst
 	 * @param isLast
 	 */
-	public static void FrcstByAccntBySubF(String name, Map<Integer, TreeMap<String, Integer>> weeklyMapsSF, boolean isFirst, boolean isLast) {
+	public static void FrcstByAccntBySubF(String name, Map<Integer, LinkedHashMap<String, Integer>> weeklyMapsSF, boolean isFirst, boolean isLast) {
 		Row row;
 		
 		//create header only if isFirst
@@ -100,7 +100,7 @@ public class TemplateBuilder {
 	 * Mix sheet, should be the second tab in the file. Should include column for CSA judgment
 	 * @param mixTemp
 	 */
-	public static void createMixTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
+	public static void createMixTemplate(String name, Map<Integer, LinkedHashMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		DataFormat df;
 		CellStyle percentageStyle, percentageStyle2;
@@ -185,7 +185,7 @@ public class TemplateBuilder {
 						c =r.createCell(3 + (wk - 1)*3);
 						try {
 							if(wk < 3) {
-								c.setCellValue("");
+								c.setCellValue(0);
 							} else if(wk < 8) {
 								double soma = 0;
 								for (int n = 1; n < wk - 1; n++) {
@@ -208,7 +208,7 @@ public class TemplateBuilder {
 						c =r.createCell(4 + (wk - 1)*3);
 						try {
 							if(wk < 3) {
-								c.setCellValue("");
+								c.setCellValue(0);
 							} else if(wk < 8) {
 								double soma = 0;
 								for (int n = 1; n < wk - 1; n++) {
@@ -248,7 +248,7 @@ public class TemplateBuilder {
 	/**
 	 * Forecast by account after CSAM judgment, should be the last (3rd) tab in the file
 	 */
-	public static void createTemplate(String name, Map<Integer, TreeMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
+	public static void createTemplate(String name, Map<Integer, LinkedHashMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		int firstRow, lastRow;
 		
@@ -340,6 +340,9 @@ public class TemplateBuilder {
 			row.createCell(48).setCellValue("Week 12 Req");
 			row.createCell(49).setCellValue("Week 13 Req");
 			row.createCell(50).setCellValue("Week 14 Req");
+			for( Cell c2 : row) {
+				sheet1.autoSizeColumn(c2.getColumnIndex());
+			}
 	    }
 		
 		//create SKU column
@@ -451,9 +454,7 @@ public class TemplateBuilder {
 			}
 		}
 		//freeze panes and re-autosize this column after adding content
-		for( Cell c2 : sheet1.getRow(2)) {
-			sheet1.autoSizeColumn(c2.getColumnIndex());
-		}
+		sheet1.autoSizeColumn(1);
 		sheet1.createFreezePane(2, 1, 22, 1);
 		
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
