@@ -76,7 +76,7 @@ public class GTAFunctions {
 		//check the latest Act week, only once
 		if(isFirst) {
 			lastActWk = LastActWk(sheet1);
-			GTAGUI.generalMessage("Last Actual Week: " + (lastActWk - 4));
+			GTAGUI.generalMessage("Last Actual Week: " + (lastActWk));
 		}
 		
 		// list subfamilies, list this for each file
@@ -303,7 +303,7 @@ public class GTAFunctions {
 	public static int LastActWk (Sheet sheet1) {
 		Row wkRow1 = sheet1.getRow(7);
 		int columnIndexSku = 0;
-		int lAWIndex = 0;
+		int lAW = 0;
 		double soma;
 		
 		wkFor:
@@ -328,7 +328,7 @@ public class GTAFunctions {
 							}
 						}
 						if(soma == 0.0) {
-							lAWIndex = columnIndexSku;
+							lAW = columnIndexSku - 4;
 							break wkFor;
 						}
 					}
@@ -339,6 +339,6 @@ public class GTAFunctions {
 				}
 			}
 		}
-		return lAWIndex;
+		return lAW;
 	}
 }

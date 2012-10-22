@@ -186,18 +186,29 @@ public class TemplateBuilder {
 						try {
 							if(wk < 3) {
 								c.setCellValue(0);
-							} else if(wk < 8) {
-								double soma = 0;
-								for (int n = 1; n < wk - 1; n++) {
-									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								
+							} else if(wk < 8) {  //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+								if(GTAFunctions.lastActWk >= wk - 2 ) {
+									double soma = 0;
+									for (int n = 1; n < wk - 1; n++) {
+										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+									}
+									c.setCellValue(soma/(wk - 2));
+								} else {
+									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 								}
-								c.setCellValue(soma/(wk - 2));
-							} else {
-								double soma = 0;
-								for (int n = wk - 6; n < wk - 1; n++) {
-									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+			
+							} else { //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+								if(GTAFunctions.lastActWk >= wk - 2 ) {
+									double soma = 0;
+									for (int n = wk - 6; n < wk - 1; n++) {
+										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+									}
+									c.setCellValue(soma/5);
+								} else {
+									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 								}
-								c.setCellValue(soma/5);
+								
 							}
 						} catch (IllegalStateException e) {
 							c.setCellValue(0);
@@ -209,18 +220,29 @@ public class TemplateBuilder {
 						try {
 							if(wk < 3) {
 								c.setCellValue(0);
-							} else if(wk < 8) {
-								double soma = 0;
-								for (int n = 1; n < wk - 1; n++) {
-									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								
+							} else if(wk < 8) {  //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+								if(GTAFunctions.lastActWk >= wk - 2 ) {
+									double soma = 0;
+									for (int n = 1; n < wk - 1; n++) {
+										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+									}
+									c.setCellValue(soma/(wk - 2));
+								} else {
+									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 								}
-								c.setCellValue(soma/(wk - 2));
-							} else {
-								double soma = 0;
-								for (int n = wk - 6; n < wk - 1; n++) {
-									soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+			
+							} else { //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+								if(GTAFunctions.lastActWk >= wk - 2 ) {
+									double soma = 0;
+									for (int n = wk - 6; n < wk - 1; n++) {
+										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+									}
+									c.setCellValue(soma/5);
+								} else {
+									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 								}
-								c.setCellValue(soma/5);
+								
 							}
 						} catch (IllegalStateException e) {
 							c.setCellValue(0);
@@ -362,85 +384,85 @@ public class TemplateBuilder {
 						
 						switch ( wk) {
 						case 1: String formula1 = "Mix!E" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-							c = r.createCell(24);
+							c = r.createCell(10);
 							c.setCellFormula(formula1);
 							c.setCellStyle(integ);
 							break;
 						
 						case 2: String formula2 = "Mix!H" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(25);
+						c = r.createCell(11);
 						c.setCellFormula(formula2);
 						c.setCellStyle(integ);
 						break;
 						
 						case 3: String formula3 = "Mix!K" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(26);
+						c = r.createCell(12);
 						c.setCellFormula(formula3);
 						c.setCellStyle(integ);
 						break;
 						
 						case 4: String formula4 = "Mix!N" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(27);
+						c = r.createCell(13);
 						c.setCellFormula(formula4);
 						c.setCellStyle(integ);
 						break;
 						
 						case 5: String formula5 = "Mix!Q" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(28);
+						c = r.createCell(14);
 						c.setCellFormula(formula5);
 						c.setCellStyle(integ);
 						break;
 						
 						case 6: String formula6 = "Mix!T" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(29);
+						c = r.createCell(15);
 						c.setCellFormula(formula6);
 						c.setCellStyle(integ);
 						break;
 						
 						case 7: String formula7 = "Mix!W" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(30);
+						c = r.createCell(16);
 						c.setCellFormula(formula7);
 						c.setCellStyle(integ);
 						break;
 						
 						case 8: String formula8 = "Mix!Z" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(31);
+						c = r.createCell(17);
 						c.setCellFormula(formula8);
 						c.setCellStyle(integ);
 						break;
 						
 						case 9: String formula9 = "Mix!AC" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(32);
+						c = r.createCell(18);
 						c.setCellFormula(formula9);
 						c.setCellStyle(integ);
 						break;
 						
 						case 10: String formula10 = "Mix!AF" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(33);
+						c = r.createCell(19);
 						c.setCellFormula(formula10);
 						c.setCellStyle(integ);
 						break;
 						
 						case 11: String formula11 = "Mix!AI" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(34);
+						c = r.createCell(20);
 						c.setCellFormula(formula11);
 						c.setCellStyle(integ);
 						break;
 						
 						case 12: String formula12 = "Mix!AL" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(35);
+						c = r.createCell(21);
 						c.setCellFormula(formula12);
 						c.setCellStyle(integ);
 						break;
 						
 						case 13: String formula13 = "Mix!AO" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(36);
+						c = r.createCell(22);
 						c.setCellFormula(formula13);
 						c.setCellStyle(integ);
 						break;
 						
 						case 14: String formula14 = "Mix!AR" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
-						c = r.createCell(37);
+						c = r.createCell(23);
 						c.setCellFormula(formula14);
 						c.setCellStyle(integ);
 						break;
@@ -455,7 +477,7 @@ public class TemplateBuilder {
 		}
 		//freeze panes and re-autosize this column after adding content
 		sheet1.autoSizeColumn(1);
-		sheet1.createFreezePane(2, 1, 22, 1);
+		sheet1.createFreezePane(2, 1, 8, 1);
 		
 		//update the previousLastRowMix, subtract 1 since we had added 1 and didn't "use" the row yet
 		previousLastRowFore = rCountFore - 1;
