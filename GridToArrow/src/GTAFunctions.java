@@ -20,7 +20,7 @@ public class GTAFunctions {
 	public static Map<String, String> skuSubF;
 	public static Map<Integer, LinkedHashMap<String, Integer>> weeklyMapsSF;
 	public static Map<Integer, LinkedHashMap<String, Double>> weeklyMapsSku;
-	static int wks = 0;
+	static int wks, lastActWk = 0;
 	static Row wkRow0;
 	
 	public static void countAndCheck(File inputPath) {
@@ -73,6 +73,11 @@ public class GTAFunctions {
 			GTAGUI.generalMessage("Weeks in this quarter: " + wks);
 		}
 		
+		//check the latest Act week, only once
+		if(isFirst) {
+			lastActWk = LastActWk(sheet1);
+			GTAGUI.generalMessage("Last Actual Week: " + (lastActWk - 4));
+		}
 		
 		// list subfamilies, list this for each file
 		ArrayList<String> subFamilies = new ArrayList<String>();
@@ -288,5 +293,52 @@ public class GTAFunctions {
 		}
 		GTAGUI.generalMessage("test: " + test + ", test1: " + test1 + ", test2: " + test2 + ", test3: " + test3);
 		return skuSubF;
+	}
+	
+	/**
+	 * 
+	 * @param sheet1
+	 * @return
+	 */		
+	public static int LastActWk (Sheet sheet1) {
+		Row wkRow1 = sheet1.getRow(7);
+		int columnIndexSku = 0;
+		int lAWIndex = 0;
+		double soma;
+		
+		wkFor:
+		for (int w = 1; w < wks + 1; w++) {
+			soma = 0.0;
+			//find the column index of this wk, for the SKU tab
+			for (Cell d : wkRow1) {
+				try {
+					if ((new Double(d.getNumericCellValue())).intValue() == w) {
+						columnIndexSku = d.getColumnIndex();
+						for (Row rw : sheet1) {
+							try {
+								if (rw.getRowNum() > 6 && 
+										!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
+										rw.getCell(3).getStringCellValue().contains("PPM"))  {
+									soma += rw.getCell(columnIndexSku).getNumericCellValue();
+								}
+							} catch (NullPointerException e) {
+								//	e.printStackTrace();
+							} catch (IllegalStateException e) {
+								//	e.printStackTrace();
+							}
+						}
+						if(soma == 0.0) {
+							lAWIndex = columnIndexSku;
+							break wkFor;
+						}
+					}
+				} catch (NullPointerException e) {
+				//	e.printStackTrace();
+				} catch (IllegalStateException e) {
+				//	e.printStackTrace();
+				}
+			}
+		}
+		return lAWIndex;
 	}
 }

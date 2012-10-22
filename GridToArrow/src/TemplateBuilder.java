@@ -71,7 +71,7 @@ public class TemplateBuilder {
 			row.createCell(1).setCellValue(k);
 			rCountFBA++;
 		}
-		//add mix data
+		//add forecast data
 		for (int wk = 1; wk < weeklyMapsSF.size() + 1; wk++) {
 			try{
 				for(Row r : sheetForByAcc) {
@@ -324,22 +324,22 @@ public class TemplateBuilder {
 			row.createCell(33).setCellValue("Week 10 JST");
 			row.createCell(34).setCellValue("Week 11 JST");
 			row.createCell(35).setCellValue("Week 12 JST");
-			row.createCell(35).setCellValue("Week 13 JST");
-			row.createCell(36).setCellValue("Week 14 JST");
-			row.createCell(37).setCellValue("Week 1 Req");
-			row.createCell(38).setCellValue("Week 2 Req");
-			row.createCell(39).setCellValue("Week 3 Req");
-			row.createCell(40).setCellValue("Week 4 Req");
-			row.createCell(41).setCellValue("Week 5 Req");
-			row.createCell(42).setCellValue("Week 6 Req");
-			row.createCell(43).setCellValue("Week 7 Req");
-			row.createCell(44).setCellValue("Week 8 Req");
-			row.createCell(45).setCellValue("Week 9 Req");
-			row.createCell(46).setCellValue("Week 10 Req");
-			row.createCell(47).setCellValue("Week 11 Req");
-			row.createCell(48).setCellValue("Week 12 Req");
-			row.createCell(49).setCellValue("Week 13 Req");
-			row.createCell(50).setCellValue("Week 14 Req");
+			row.createCell(36).setCellValue("Week 13 JST");
+			row.createCell(37).setCellValue("Week 14 JST");
+			row.createCell(38).setCellValue("Week 1 Req");
+			row.createCell(39).setCellValue("Week 2 Req");
+			row.createCell(40).setCellValue("Week 3 Req");
+			row.createCell(41).setCellValue("Week 4 Req");
+			row.createCell(42).setCellValue("Week 5 Req");
+			row.createCell(43).setCellValue("Week 6 Req");
+			row.createCell(44).setCellValue("Week 7 Req");
+			row.createCell(45).setCellValue("Week 8 Req");
+			row.createCell(46).setCellValue("Week 9 Req");
+			row.createCell(47).setCellValue("Week 10 Req");
+			row.createCell(48).setCellValue("Week 11 Req");
+			row.createCell(49).setCellValue("Week 12 Req");
+			row.createCell(50).setCellValue("Week 13 Req");
+			row.createCell(51).setCellValue("Week 14 Req");
 			for( Cell c2 : row) {
 				sheet1.autoSizeColumn(c2.getColumnIndex());
 			}
