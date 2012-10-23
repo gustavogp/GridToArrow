@@ -22,6 +22,7 @@ public class GTAFunctions {
 	public static Map<Integer, LinkedHashMap<String, Double>> weeklyMapsSku;
 	static int wks, lastActWk = 0;
 	static Row wkRow0;
+	static boolean distie = false;
 	
 	public static void countAndCheck(File inputPath) {
 		ArrayList<File> folderFiles = new ArrayList<File>();
@@ -53,6 +54,7 @@ public class GTAFunctions {
 		FileInputStream readStr = null;
 		String name = f2.getName();
 		String subName = name.substring(name.indexOf(".")+1, name.lastIndexOf("."));
+		
 		try {
 			readStr = new FileInputStream(f2);
 			wb = new HSSFWorkbook(readStr);
@@ -65,7 +67,13 @@ public class GTAFunctions {
 			e.printStackTrace();
 		}
 		
-		wkRow0 = sheet0.getRow(7);
+		distie = name.contains("Distie");
+		if(distie) {
+			wkRow0 = sheet0.getRow(6);
+		} else {
+			wkRow0 = sheet0.getRow(7);
+		}
+		
 		
 		//how many weeks in this quarter, check only once
 		if(isFirst) {
@@ -129,7 +137,7 @@ public class GTAFunctions {
 		int nwks = 0;
 		for (Cell c : wkRow0) {
 			try {
-				if (c.getStringCellValue().equalsIgnoreCase("ST")) {
+				if (c.getStringCellValue().equalsIgnoreCase("ST") || c.getStringCellValue().equalsIgnoreCase("ST+XO")) {
 					nwks = (int) wkRow0.getCell((c.getColumnIndex() - 1)).getNumericCellValue();
 					break;
 				}
@@ -149,7 +157,7 @@ public class GTAFunctions {
 	 * @return
 	 */
 	public static Map<Integer, LinkedHashMap<String, Integer>> createSubFPerWeek(int wks, Sheet sheet0 ){
-		Row wkRow00 = sheet0.getRow(7);
+		Row wkRow00 = wkRow0;
 		Map<Integer, LinkedHashMap<String, Integer>> weeklyMapsSF = new TreeMap<Integer, LinkedHashMap<String, Integer>>();
 		int columnIndexSF = 0;
 		for (int w = 1; w < wks + 1; w++) {
@@ -231,14 +239,27 @@ public class GTAFunctions {
 			//build Sku mix Per Week map
 			for (Row rw : sheet1) {
 				try {
-					if (rw.getRowNum() > 6 && 
-							!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
-							rw.getCell(3).getStringCellValue().contains("PPM"))  {
-						//for some reason we are not catching the /0, here's the workaround
-						if((weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) == 0) {
-							skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
-						} else {
-							skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
+					if(distie) {
+						if (rw.getRowNum() > 6 && 
+								!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								rw.getCell(2).getStringCellValue().contains("PPM"))  {
+							//for some reason we are not catching the /0, here's the workaround
+							if((weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(2).getStringCellValue()))) == 0) {
+								skuPerWk.put(rw.getCell(2).getStringCellValue(),0.0);
+							} else {
+								skuPerWk.put(rw.getCell(2).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(2).getStringCellValue()))) );
+							}
+						}
+					} else {
+						if (rw.getRowNum() > 6 && 
+								!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								rw.getCell(3).getStringCellValue().contains("PPM"))  {
+							//for some reason we are not catching the /0, here's the workaround
+							if((weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) == 0) {
+								skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
+							} else {
+								skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
+							}
 						}
 					}
 				} catch (NullPointerException e) {
@@ -269,22 +290,42 @@ public class GTAFunctions {
 		for (Row r : sheet1) {
 			test++;
 			try {
-				if( r.getRowNum() > 6 &&
-					(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) ||
-					(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
-					r.getCell(3).getStringCellValue().contains("PPM")) {
-						tempArray.add(r.getCell(3).getStringCellValue());
-						test1++;
-				} else if(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
-						sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK &&
-						 !(r.getCell(2).getStringCellValue().contains("Total"))) {
-					test2++;
-					for (String tmp : tempArray) {
-						skuSubF.put(tmp, r.getCell(2).getStringCellValue());
-						test3++;
-					}
-					tempArray = new ArrayList<String>();//create a new list object, instead of clearing the previous one
+				if(distie) {
+					if( r.getRowNum() > 6 &&
+							(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) ||
+							(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
+							r.getCell(2).getStringCellValue().contains("PPM")) {
+								tempArray.add(r.getCell(2).getStringCellValue());
+								test1++;
+						} else if(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK &&
+								 !(r.getCell(1).getStringCellValue().contains("Total"))) {
+							test2++;
+							for (String tmp : tempArray) {
+								skuSubF.put(tmp, r.getCell(1).getStringCellValue());
+								test3++;
+							}
+							tempArray = new ArrayList<String>();//create a new list object, instead of clearing the previous one
+						}
+				} else {
+					if( r.getRowNum() > 6 &&
+							(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) ||
+							(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
+							r.getCell(3).getStringCellValue().contains("PPM")) {
+								tempArray.add(r.getCell(3).getStringCellValue());
+								test1++;
+						} else if(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK &&
+								 !(r.getCell(2).getStringCellValue().contains("Total"))) {
+							test2++;
+							for (String tmp : tempArray) {
+								skuSubF.put(tmp, r.getCell(2).getStringCellValue());
+								test3++;
+							}
+							tempArray = new ArrayList<String>();//create a new list object, instead of clearing the previous one
+						}
 				}
+				
 			} catch (NullPointerException e) {
 				//	e.printStackTrace();
 			} catch (IllegalStateException e) {
@@ -316,11 +357,20 @@ public class GTAFunctions {
 						columnIndexSku = d.getColumnIndex();
 						for (Row rw : sheet1) {
 							try {
-								if (rw.getRowNum() > 6 && 
-										!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
-										rw.getCell(3).getStringCellValue().contains("PPM"))  {
-									soma += rw.getCell(columnIndexSku).getNumericCellValue();
+								if(distie) {
+									if (rw.getRowNum() > 6 && 
+											!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+											rw.getCell(2).getStringCellValue().contains("PPM"))  {
+										soma += rw.getCell(columnIndexSku).getNumericCellValue();
+									}
+								} else {
+									if (rw.getRowNum() > 6 && 
+											!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
+											rw.getCell(3).getStringCellValue().contains("PPM"))  {
+										soma += rw.getCell(columnIndexSku).getNumericCellValue();
+									}
 								}
+								
 							} catch (NullPointerException e) {
 								//	e.printStackTrace();
 							} catch (IllegalStateException e) {
@@ -328,7 +378,11 @@ public class GTAFunctions {
 							}
 						}
 						if(soma == 0.0) {
-							lAW = columnIndexSku - 4;
+							if(distie) {
+								lAW = columnIndexSku - 3;
+							} else {
+								lAW = columnIndexSku - 4;
+							}
 							break wkFor;
 						}
 					}
