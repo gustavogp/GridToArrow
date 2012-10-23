@@ -476,6 +476,7 @@ public class TemplateBuilder {
 			}
 		}
 		//freeze panes and re-autosize this column after adding content
+		sheet1.autoSizeColumn(0);
 		sheet1.autoSizeColumn(1);
 		sheet1.createFreezePane(2, 1, 8, 1);
 		

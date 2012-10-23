@@ -53,7 +53,8 @@ public class GTAFunctions {
 		Sheet sheet1 = null, sheet0 = null;
 		FileInputStream readStr = null;
 		String name = f2.getName();
-		String subName = name.substring(name.indexOf(".")+1, name.lastIndexOf("."));
+	//	String subName = name.substring(name.indexOf(".")+1, name.lastIndexOf("."));
+		String subName;
 		
 		try {
 			readStr = new FileInputStream(f2);
@@ -70,8 +71,12 @@ public class GTAFunctions {
 		distie = name.contains("Distie");
 		if(distie) {
 			wkRow0 = sheet0.getRow(6);
+			//get the "Customer Name"
+			subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on ").length());
 		} else {
 			wkRow0 = sheet0.getRow(7);
+			//get the "Customer Name"
+			subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on 01.M -  Consumer - Retail - ").length());
 		}
 		
 		
