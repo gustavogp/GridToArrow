@@ -178,11 +178,20 @@ public class GTAFunctions {
 			//build subFamily Per Week map
 			for (Row rw : sheet0) {
 				try {
-					if (rw.getRowNum() > 6 && 
-							!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
-							!(rw.getCell(1).getStringCellValue().contains("Total")) && 
-							!(sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
-						subFPerWk.put(rw.getCell(1).getStringCellValue(), (new Double(rw.getCell(columnIndexSF).getNumericCellValue())).intValue());
+					if(distie) {
+						if (rw.getRowNum() > 6 && 
+								!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								!(rw.getCell(1).getStringCellValue().contains("Total")) && 
+								!(sheet0.getRow(rw.getRowNum()+2).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
+							subFPerWk.put(rw.getCell(1).getStringCellValue(), (new Double(rw.getCell(columnIndexSF).getNumericCellValue())).intValue());
+						}
+					} else {
+						if (rw.getRowNum() > 6 && 
+								!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								!(rw.getCell(1).getStringCellValue().contains("Total")) && 
+								!(sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
+							subFPerWk.put(rw.getCell(1).getStringCellValue(), (new Double(rw.getCell(columnIndexSF).getNumericCellValue())).intValue());
+						}
 					}
 				} catch (NullPointerException e) {
 				//	e.printStackTrace();
@@ -268,7 +277,11 @@ public class GTAFunctions {
 				//	e.printStackTrace();
 				} catch (ArithmeticException e) {
 				//  e.printStackTrace();
-					skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
+					if(distie) {
+						skuPerWk.put(rw.getCell(2).getStringCellValue(),0.0);
+					} else {
+						skuPerWk.put(rw.getCell(3).getStringCellValue(),0.0);
+					}
 				}
 				
 			}
@@ -293,12 +306,14 @@ public class GTAFunctions {
 				if(distie) {
 					if( r.getRowNum() > 6 &&
 							(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) ||
-							(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
+							(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK)) ||
+							r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) ) &&
 							r.getCell(2).getStringCellValue().contains("PPM")) {
 								tempArray.add(r.getCell(2).getStringCellValue());
 								test1++;
 						} else if(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
-								sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK &&
+								!(sheet1.getRow(r.getRowNum()-1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								(sheet1.getRow(r.getRowNum()-1).getCell(2).getStringCellValue().contains("PPM")) &&
 								 !(r.getCell(1).getStringCellValue().contains("Total"))) {
 							test2++;
 							for (String tmp : tempArray) {
