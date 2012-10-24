@@ -48,21 +48,21 @@ public class TemplateBuilder {
 			row = sheetForByAcc.createRow(rCountFBA);
 			rCountFBA++;
 			row.createCell(0).setCellValue("Customer Name");
-			row.createCell(1).setCellValue("Apple Part Nr");
-			row.createCell(2).setCellValue("Week 1 Forecast");
-			row.createCell(3).setCellValue("Week 2 Forecast");
-			row.createCell(4).setCellValue("Week 3 Forecast");
-			row.createCell(5).setCellValue("Week 4 Forecast");
-			row.createCell(6).setCellValue("Week 5 Forecast");
-			row.createCell(7).setCellValue("Week 6 Forecast");
-			row.createCell(8).setCellValue("Week 7 Forecast");
-			row.createCell(9).setCellValue("Week 8 Forecast");
-			row.createCell(10).setCellValue("Week 9 Forecast");
-			row.createCell(11).setCellValue("Week 10 Forecast");
-			row.createCell(12).setCellValue("Week 11 Forecast");
-			row.createCell(13).setCellValue("Week 12 Forecast");
-			row.createCell(14).setCellValue("Week 13 Forecast");
-			row.createCell(15).setCellValue("Week 14 Forecast");
+			row.createCell(1).setCellValue("Sub LOB");
+			row.createCell(2).setCellValue("Week 1 ");
+			row.createCell(3).setCellValue("Week 2 ");
+			row.createCell(4).setCellValue("Week 3 ");
+			row.createCell(5).setCellValue("Week 4 ");
+			row.createCell(6).setCellValue("Week 5 ");
+			row.createCell(7).setCellValue("Week 6 ");
+			row.createCell(8).setCellValue("Week 7 ");
+			row.createCell(9).setCellValue("Week 8 ");
+			row.createCell(10).setCellValue("Week 9 ");
+			row.createCell(11).setCellValue("Week 10 ");
+			row.createCell(12).setCellValue("Week 11 ");
+			row.createCell(13).setCellValue("Week 12 ");
+			row.createCell(14).setCellValue("Week 13 ");
+			row.createCell(15).setCellValue("Week 14 ");
 		}	
 		//create SubFamily column
 		for(String k : weeklyMapsSF.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
@@ -103,7 +103,7 @@ public class TemplateBuilder {
 	public static void createMixTemplate(String name, Map<Integer, LinkedHashMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		DataFormat df;
-		CellStyle percentageStyle, percentageStyle2;
+		CellStyle percentageStyle, percentageStyle2, centerStyle;
 		
 		//create format styles
 		df = wb.createDataFormat();
@@ -116,6 +116,9 @@ public class TemplateBuilder {
 		percentageStyle2.setFillPattern(CellStyle.SOLID_FOREGROUND);
 		percentageStyle2.setBorderRight(CellStyle.BORDER_THICK);
 		
+		centerStyle = wb.createCellStyle();
+		centerStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		
 		//create header, merge header cells, add row bellow header (subheader)
 		if(isFirst) {
 			row = sheetMix.createRow(rCountMix);
@@ -124,32 +127,46 @@ public class TemplateBuilder {
 			row.createCell(1).setCellValue("Apple Part Nr");
 			row.createCell(2).setCellValue("Week 1");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 2, 4));
+			row.getCell(2).setCellStyle(centerStyle);
 			row.createCell(5).setCellValue("Week 2");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 5, 7));
+			row.getCell(5).setCellStyle(centerStyle);
 			row.createCell(8).setCellValue("Week 3");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 8, 10));
+			row.getCell(8).setCellStyle(centerStyle);
 			row.createCell(11).setCellValue("Week 4");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 11, 13));
+			row.getCell(11).setCellStyle(centerStyle);
 			row.createCell(14).setCellValue("Week 5");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 14, 16));
+			row.getCell(14).setCellStyle(centerStyle);
 			row.createCell(17).setCellValue("Week 6");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 17, 19));
+			row.getCell(17).setCellStyle(centerStyle);
 			row.createCell(20).setCellValue("Week 7");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 20, 22));
+			row.getCell(20).setCellStyle(centerStyle);
 			row.createCell(23).setCellValue("Week 8");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 23, 25));
+			row.getCell(23).setCellStyle(centerStyle);
 			row.createCell(26).setCellValue("Week 9");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 26, 28));
+			row.getCell(26).setCellStyle(centerStyle);
 			row.createCell(29).setCellValue("Week 10");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 29, 31));
+			row.getCell(29).setCellStyle(centerStyle);
 			row.createCell(32).setCellValue("Week 11");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 32, 34));
+			row.getCell(32).setCellStyle(centerStyle);
 			row.createCell(35).setCellValue("Week 12");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 35, 37));
+			row.getCell(35).setCellStyle(centerStyle);
 			row.createCell(38).setCellValue("Week 13");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 38, 40));
+			row.getCell(38).setCellStyle(centerStyle);
 			row.createCell(41).setCellValue("Week 14");
 			sheetMix.addMergedRegion(new CellRangeAddress(rCountMix-1, rCountMix-1, 41, 43));
+			row.getCell(41).setCellStyle(centerStyle);
 			row = sheetMix.createRow(rCountMix);
 			rCountMix++;
 			for(int wk = 1 ; wk < 15 ; wk++) {

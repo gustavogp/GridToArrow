@@ -69,14 +69,19 @@ public class GTAFunctions {
 		}
 		
 		distie = name.contains("Distie");
-		if(distie) {
+		if(distie || name.contains("Mexico")) {
 			wkRow0 = sheet0.getRow(6);
 			//get the "Customer Name"
-			subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on ").length());
+			subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on").length());
 		} else {
 			wkRow0 = sheet0.getRow(7);
 			//get the "Customer Name"
-			subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on 01.M -  Consumer - Retail - ").length());
+			if(sheet0.getRow(4).getCell(1).getStringCellValue().contains("APR")) {
+				subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on 01.M -  Consumer - APR -").length());
+			} else {
+				subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on 01.M -  Consumer - Retail -").length());
+			}
+			
 		}
 		
 		
@@ -263,6 +268,11 @@ public class GTAFunctions {
 							} else {
 								skuPerWk.put(rw.getCell(2).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(2).getStringCellValue()))) );
 							}
+						} else if(rw.getRowNum() > 6 && 
+								!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) && 
+								rw.getCell(2).getStringCellValue().contains("PPM") &&
+								rw.getCell(2).getStringCellValue().contains("PPM")) {
+							//do what
 						}
 					} else {
 						if (rw.getRowNum() > 6 && 
