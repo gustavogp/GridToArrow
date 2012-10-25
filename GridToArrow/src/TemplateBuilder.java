@@ -11,6 +11,7 @@ import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -35,6 +36,8 @@ public class TemplateBuilder {
 	static int previousLastRowFore = 0;
 	static int rowsToLeap = 2;
 	static Map<Integer,Integer> RTLMap = new HashMap<Integer,Integer>();
+	static int beforeThisRow = 0;
+	static Map<Integer,Integer> BTRMap = new HashMap<Integer,Integer>();
 	
 	/**
 	 * Forecast by account BEFORE CSAM judgment, should be the first tab in the file
@@ -108,9 +111,9 @@ public class TemplateBuilder {
 	public static void createMixTemplate(String name, Map<Integer, LinkedHashMap<String, Double>> weeklyMapsSku, boolean isFirst, boolean isLast) {
 		Row row;
 		DataFormat df;
-		CellStyle percentageStyle, percentageStyle2, centerStyle;
+		CellStyle percentageStyle, percentageStyle2, centerStyle, percentBoldStyle;
 		
-		//create format styles
+		//create format styles and font
 		df = wb.createDataFormat();
 		percentageStyle = wb.createCellStyle();
 		percentageStyle.setDataFormat(df.getFormat("0.00%"));
@@ -123,6 +126,13 @@ public class TemplateBuilder {
 		
 		centerStyle = wb.createCellStyle();
 		centerStyle.setAlignment(CellStyle.ALIGN_CENTER);
+		
+		Font f = wb.createFont();
+		f.setBoldweight(Font.BOLDWEIGHT_BOLD);
+		percentBoldStyle = wb.createCellStyle();
+		percentBoldStyle.setFont(f);
+		percentBoldStyle.setDataFormat(df.getFormat("0.00%"));
+		percentBoldStyle.setBorderRight(CellStyle.BORDER_THICK);
 		
 		//create header, merge header cells, add row bellow header (subheader)
 		if(isFirst) {
@@ -201,77 +211,122 @@ public class TemplateBuilder {
 					if (r.getRowNum() > previousLastRowMix) {
 						//Actual values
 						Cell c = r.createCell(2 + (wk-1)*3);
-						c.setCellValue(weeklyMapsSku.get(wk).get(r.getCell(1).getStringCellValue()));
-						c.setCellStyle(percentageStyle);
+						if(r.getCell(1).getStringCellValue().contains("PPM")) {
+							c.setCellValue(weeklyMapsSku.get(wk).get(r.getCell(1).getStringCellValue()));
+							c.setCellStyle(percentageStyle);
+							beforeThisRow++;
+						}
+						
 						
 						//calculate averages
 						c =r.createCell(3 + (wk - 1)*3);
-						try {
-							if(wk < 3) {
-								c.setCellValue(0);
+						if(r.getCell(1).getStringCellValue().contains("PPM")) {
+							try {
+								if(wk < 3) {
+									c.setCellValue(0);
 								
-							} else if(wk < 8) {  //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
-								if(GTAFunctions.lastActWk >= wk - 2 ) {
-									double soma = 0;
-									for (int n = 1; n < wk - 1; n++) {
-										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								} else if(wk < 8) {  //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+									if(GTAFunctions.lastActWk >= wk - 2 ) {
+										double soma = 0;
+										for (int n = 1; n < wk - 1; n++) {
+											soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+										}
+										c.setCellValue(soma/(wk - 2));
+									} else {
+										c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 									}
-									c.setCellValue(soma/(wk - 2));
-								} else {
-									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
-								}
 			
-							} else { //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
-								if(GTAFunctions.lastActWk >= wk - 2 ) {
-									double soma = 0;
-									for (int n = wk - 6; n < wk - 1; n++) {
-										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								} else { //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+									if(GTAFunctions.lastActWk >= wk - 2 ) {
+										double soma = 0;
+										for (int n = wk - 6; n < wk - 1; n++) {
+											soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+										}
+										c.setCellValue(soma/5);
+									} else {
+										c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 									}
-									c.setCellValue(soma/5);
-								} else {
-									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
-								}
 								
+								}
+							} catch (IllegalStateException e) {
+								c.setCellValue(0);
 							}
-						} catch (IllegalStateException e) {
-							c.setCellValue(0);
+							c.setCellStyle(percentageStyle);
 						}
-						c.setCellStyle(percentageStyle);
 						
 						//Judged values = averages
 						c =r.createCell(4 + (wk - 1)*3);
-						try {
-							if(wk < 3) {
-								c.setCellValue(0);
+						if(r.getCell(1).getStringCellValue().contains("PPM")) {
+							try {
+								if(wk < 3) {
+									c.setCellValue(0);
 								
-							} else if(wk < 8) {  //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
-								if(GTAFunctions.lastActWk >= wk - 2 ) {
-									double soma = 0;
-									for (int n = 1; n < wk - 1; n++) {
-										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								} else if(wk < 8) {  //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+									if(GTAFunctions.lastActWk >= wk - 2 ) {
+										double soma = 0;
+										for (int n = 1; n < wk - 1; n++) {
+											soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+										}
+										c.setCellValue(soma/(wk - 2));
+									} else {
+										c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 									}
-									c.setCellValue(soma/(wk - 2));
-								} else {
-									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
-								}
 			
-							} else { //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
-								if(GTAFunctions.lastActWk >= wk - 2 ) {
-									double soma = 0;
-									for (int n = wk - 6; n < wk - 1; n++) {
-										soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+								} else { //make sure the week wk-2 has the Act uploaded, otherwise use previous AVG available
+									if(GTAFunctions.lastActWk >= wk - 2 ) {
+										double soma = 0;
+										for (int n = wk - 6; n < wk - 1; n++) {
+											soma += r.getCell(2 + (n - 1)*3).getNumericCellValue();
+										}
+										c.setCellValue(soma/5);
+									} else {
+										c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
 									}
-									c.setCellValue(soma/5);
-								} else {
-									c.setCellValue(r.getCell(3 + (GTAFunctions.lastActWk + 1)*3).getNumericCellValue());
-								}
 								
+								}
+							} catch (IllegalStateException e) {
+								c.setCellValue(0);
 							}
-						} catch (IllegalStateException e) {
-							c.setCellValue(0);
+							c.setCellStyle(percentageStyle2);
+						} else {
+							if(beforeThisRow > 0) {
+								switch (wk) {
+								case 1: c.setCellFormula("SUM(E" + (r.getRowNum() + 1 - beforeThisRow) +":E" + r.getRowNum() + ")");
+									break;
+								case 2: c.setCellFormula("SUM(H" + (r.getRowNum() + 1 - beforeThisRow) +":H" + r.getRowNum() + ")");
+									break;
+								case 3: c.setCellFormula("SUM(K" + (r.getRowNum() + 1 - beforeThisRow) +":K" + r.getRowNum() + ")");
+									break;
+								case 4: c.setCellFormula("SUM(N" + (r.getRowNum() + 1 - beforeThisRow) +":N" + r.getRowNum() + ")");
+									break;
+								case 5: c.setCellFormula("SUM(Q" + (r.getRowNum() + 1 - beforeThisRow) +":Q" + r.getRowNum() + ")");
+									break;
+								case 6: c.setCellFormula("SUM(T" + (r.getRowNum() + 1 - beforeThisRow) +":T" + r.getRowNum() + ")");
+									break;
+								case 7: c.setCellFormula("SUM(W" + (r.getRowNum() + 1 - beforeThisRow) +":W" + r.getRowNum() + ")");
+									break;
+								case 8: c.setCellFormula("SUM(Z" + (r.getRowNum() + 1 - beforeThisRow) +":Z" + r.getRowNum() + ")");
+									break;
+								case 9: c.setCellFormula("SUM(AC" + (r.getRowNum() + 1 - beforeThisRow) +":AC" + r.getRowNum() + ")");
+									break;
+								case 10: c.setCellFormula("SUM(AF" + (r.getRowNum() + 1 - beforeThisRow) +":AF" + r.getRowNum() + ")");
+									break;
+								case 11: c.setCellFormula("SUM(AI" + (r.getRowNum() + 1 - beforeThisRow) +":AI" + r.getRowNum() + ")");
+									break;
+								case 12: c.setCellFormula("SUM(AL" + (r.getRowNum() + 1 - beforeThisRow) +":AL" + r.getRowNum() + ")");
+									break;
+								case 13: c.setCellFormula("SUM(AO" + (r.getRowNum() + 1 - beforeThisRow) +":AO" + r.getRowNum() + ")");
+									break;
+								case 14: c.setCellFormula("SUM(AR" + (r.getRowNum() + 1 - beforeThisRow) +":AR" + r.getRowNum() + ")");
+									break;
+								}
+								beforeThisRow = 0;
+							} else {
+								c.setCellValue(0);
+							}
+							
+							c.setCellStyle(percentBoldStyle);
 						}
-						c.setCellStyle(percentageStyle2);
-						
 						
 					}
 				}
