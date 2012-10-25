@@ -2,6 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ public class TemplateBuilder {
 	static int previousLastRowMix = 1;
 	static int rCountFore = 0;
 	static int previousLastRowFore = 0;
+	static int rowsToLeap = 2;
+	static Map<Integer,Integer> RTLMap = new HashMap<Integer,Integer>();
 	
 	/**
 	 * Forecast by account BEFORE CSAM judgment, should be the first tab in the file
@@ -89,6 +92,8 @@ public class TemplateBuilder {
 		for( Cell c : sheetForByAcc.getRow(2)) {
 			sheetForByAcc.autoSizeColumn(c.getColumnIndex());
 		}
+		
+		sheetForByAcc.createFreezePane(2, 1);
 		
 		//update the previousLastRow, subtract 1 since we had added 1 and didn't "use" the row yet
 		oldPreviousLastRow = previousLastRow;
@@ -187,6 +192,7 @@ public class TemplateBuilder {
 			row.createCell(0).setCellValue(name);
 			row.createCell(1).setCellValue(k);
 			rCountMix++;
+			
 		}
 		//add mix data
 		for (int wk = 1; wk < weeklyMapsSku.size() + 1; wk++) {
@@ -385,13 +391,17 @@ public class TemplateBuilder {
 	    }
 		
 		//create SKU column
-				for(String k : weeklyMapsSku.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
-					row = sheet1.createRow(rCountFore);
-					row.createCell(0).setCellValue(name);
-					row.createCell(1).setCellValue(k);
-					rCountFore++;
-				}
-		
+		for(String k : weeklyMapsSku.get(1).keySet()) { //could pick any of the weeks, using wk 1 here
+			if( k.contains("PPM")) {
+				row = sheet1.createRow(rCountFore);
+				row.createCell(0).setCellValue(name);
+				row.createCell(1).setCellValue(k);
+				RTLMap.put(rCountFore, rowsToLeap);
+				rCountFore++;
+			} else {
+				rowsToLeap++;
+			}
+		}
 		//add mix*subFforecast
 		for (int wk = 1; wk < weeklyMapsSku.size() + 1; wk++) {
 			try{
@@ -400,85 +410,85 @@ public class TemplateBuilder {
 						String subF = GTAFunctions.skuSubF.get(r.getCell(1).getStringCellValue());
 						
 						switch ( wk) {
-						case 1: String formula1 = "Mix!E" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 1: String formula1 = "Mix!E" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 							c = r.createCell(10);
 							c.setCellFormula(formula1);
 							c.setCellStyle(integ);
 							break;
 						
-						case 2: String formula2 = "Mix!H" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 2: String formula2 = "Mix!H" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(11);
 						c.setCellFormula(formula2);
 						c.setCellStyle(integ);
 						break;
 						
-						case 3: String formula3 = "Mix!K" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 3: String formula3 = "Mix!K" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(12);
 						c.setCellFormula(formula3);
 						c.setCellStyle(integ);
 						break;
 						
-						case 4: String formula4 = "Mix!N" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 4: String formula4 = "Mix!N" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(13);
 						c.setCellFormula(formula4);
 						c.setCellStyle(integ);
 						break;
 						
-						case 5: String formula5 = "Mix!Q" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 5: String formula5 = "Mix!Q" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(14);
 						c.setCellFormula(formula5);
 						c.setCellStyle(integ);
 						break;
 						
-						case 6: String formula6 = "Mix!T" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 6: String formula6 = "Mix!T" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(15);
 						c.setCellFormula(formula6);
 						c.setCellStyle(integ);
 						break;
 						
-						case 7: String formula7 = "Mix!W" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 7: String formula7 = "Mix!W" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(16);
 						c.setCellFormula(formula7);
 						c.setCellStyle(integ);
 						break;
 						
-						case 8: String formula8 = "Mix!Z" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 8: String formula8 = "Mix!Z" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(17);
 						c.setCellFormula(formula8);
 						c.setCellStyle(integ);
 						break;
 						
-						case 9: String formula9 = "Mix!AC" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 9: String formula9 = "Mix!AC" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(18);
 						c.setCellFormula(formula9);
 						c.setCellStyle(integ);
 						break;
 						
-						case 10: String formula10 = "Mix!AF" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 10: String formula10 = "Mix!AF" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(19);
 						c.setCellFormula(formula10);
 						c.setCellStyle(integ);
 						break;
 						
-						case 11: String formula11 = "Mix!AI" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 11: String formula11 = "Mix!AI" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(20);
 						c.setCellFormula(formula11);
 						c.setCellStyle(integ);
 						break;
 						
-						case 12: String formula12 = "Mix!AL" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 12: String formula12 = "Mix!AL" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(21);
 						c.setCellFormula(formula12);
 						c.setCellStyle(integ);
 						break;
 						
-						case 13: String formula13 = "Mix!AO" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 13: String formula13 = "Mix!AO" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(22);
 						c.setCellFormula(formula13);
 						c.setCellStyle(integ);
 						break;
 						
-						case 14: String formula14 = "Mix!AR" + (r.getRowNum()+2) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
+						case 14: String formula14 = "Mix!AR" + (r.getRowNum()+RTLMap.get(r.getRowNum())) + "*VLOOKUP(\"" + subF + "\", 'Forecast By account'!B" + firstRow + ":P" + lastRow + ", " + (wk + 1) + ", 0)";
 						c = r.createCell(23);
 						c.setCellFormula(formula14);
 						c.setCellStyle(integ);

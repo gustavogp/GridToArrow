@@ -192,7 +192,7 @@ public class GTAFunctions {
 						if (rw.getRowNum() > 6 && 
 								!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
 								!(rw.getCell(1).getStringCellValue().contains("Total")) && 
-								!(sheet0.getRow(rw.getRowNum()+2).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
+								!(sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
 							subFPerWk.put(rw.getCell(1).getStringCellValue(), (new Double(rw.getCell(columnIndexSF).getNumericCellValue())).intValue());
 						}
 					} else {
@@ -259,8 +259,10 @@ public class GTAFunctions {
 			for (Row rw : sheet1) {
 				try {
 					if(distie) {
-						if (rw.getRowNum() > 6 && 
-								!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+						if (rw.getRowNum() > 6 &&
+								(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) ||
+								(!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK)) ||
+								(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(rw.getRowNum()+1).getCell(1).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
 								rw.getCell(2).getStringCellValue().contains("PPM"))  {
 							//for some reason we are not catching the /0, here's the workaround
 							if((weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(2).getStringCellValue()))) == 0) {
@@ -268,15 +270,16 @@ public class GTAFunctions {
 							} else {
 								skuPerWk.put(rw.getCell(2).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(2).getStringCellValue()))) );
 							}
-						} else if(rw.getRowNum() > 6 && 
-								!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) && 
-								rw.getCell(2).getStringCellValue().contains("PPM") &&
-								rw.getCell(2).getStringCellValue().contains("PPM")) {
-							//do what
+						} else if(!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								!(sheet1.getRow(rw.getRowNum()-1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								((sheet1.getRow(rw.getRowNum()-1).getCell(2).getStringCellValue().contains("PPM")) || (sheet1.getRow(rw.getRowNum()-1).getCell(2).getStringCellValue().contains("Refurb")) ) &&
+								 !(rw.getCell(1).getStringCellValue().contains("Total"))) {
+							skuPerWk.put(rw.getCell(1).getStringCellValue(),10000.0); //this one adds the subfamily name, so we can sum the total mix percentages
 						}
 					} else {
-						if (rw.getRowNum() > 6 && 
-								!(rw.getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) &&
+						if (rw.getRowNum() > 6 &&
+								(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(rw.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK) ||
+								(!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(rw.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
 								rw.getCell(3).getStringCellValue().contains("PPM"))  {
 							//for some reason we are not catching the /0, here's the workaround
 							if((weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) == 0) {
@@ -284,6 +287,11 @@ public class GTAFunctions {
 							} else {
 								skuPerWk.put(rw.getCell(3).getStringCellValue(), (new Double(rw.getCell(columnIndexSku).getNumericCellValue()))/(weeklyMapsSF.get(columnIndexSF - 1).get(skuSubF.get(rw.getCell(3).getStringCellValue()))) );
 							}
+						} else if(!(rw.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
+								sheet1.getRow(rw.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK &&
+								(sheet1.getRow(rw.getRowNum()-1).getCell(3).getStringCellValue().contains("PPM") || sheet1.getRow(rw.getRowNum()-1).getCell(3).getStringCellValue().contains("Refurb") ) &&
+								 !(rw.getCell(2).getStringCellValue().contains("Total"))) {
+							skuPerWk.put(rw.getCell(2).getStringCellValue(),10000.0); //this one adds the subfamily name, so we can sum the total mix percentages
 						}
 					}
 				} catch (NullPointerException e) {
@@ -313,26 +321,29 @@ public class GTAFunctions {
 	public static Map<String, String> createSkuSubF(Sheet sheet1) {
 		Map<String, String> skuSubF = new HashMap<String, String>();
 		ArrayList<String> tempArray = new ArrayList<String>();
-		int test = 0, test1 = 0, test2 = 0, test3 = 0;
+		int test = 0, test1 = 0, test2 = 0, test3 = 0, test4 = 0;
 		
 		for (Row r : sheet1) {
 			test++;
 			try {
 				if(distie) {
 					if( r.getRowNum() > 6 &&
-							(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) ||
+							( (r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK)) ||
 							(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) && !(sheet1.getRow(r.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK)) ||
-							r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) ) &&
+							(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK && !(sheet1.getRow(r.getRowNum()+1).getCell(1).getCellType()==Cell.CELL_TYPE_BLANK)) ) &&
 							r.getCell(2).getStringCellValue().contains("PPM")) {
 								tempArray.add(r.getCell(2).getStringCellValue());
 								test1++;
 						} else if(!(r.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
 								!(sheet1.getRow(r.getRowNum()-1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
-								(sheet1.getRow(r.getRowNum()-1).getCell(2).getStringCellValue().contains("PPM")) &&
-								 !(r.getCell(1).getStringCellValue().contains("Total"))) {
+								(sheet1.getRow(r.getRowNum()-1).getCell(2).getStringCellValue().contains("PPM") || sheet1.getRow(r.getRowNum()-1).getCell(2).getStringCellValue().contains("Refurb") ) &&
+								 !(r.getCell(1).getStringCellValue().contains("Total")) ) {
 							test2++;
 							for (String tmp : tempArray) {
-								skuSubF.put(tmp, r.getCell(1).getStringCellValue());
+								if(skuSubF.put(tmp, r.getCell(1).getStringCellValue()) != null) {
+									test4++;
+								}
+								
 								test3++;
 							}
 							tempArray = new ArrayList<String>();//create a new list object, instead of clearing the previous one
@@ -346,6 +357,7 @@ public class GTAFunctions {
 								test1++;
 						} else if(!(r.getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) &&
 								sheet1.getRow(r.getRowNum()+1).getCell(3).getCellType()==Cell.CELL_TYPE_BLANK &&
+								(sheet1.getRow(r.getRowNum()-1).getCell(3).getStringCellValue().contains("PPM") || sheet1.getRow(r.getRowNum()-1).getCell(3).getStringCellValue().contains("Refurb") ) &&
 								 !(r.getCell(2).getStringCellValue().contains("Total"))) {
 							test2++;
 							for (String tmp : tempArray) {
@@ -362,7 +374,7 @@ public class GTAFunctions {
 				//	e.printStackTrace();
 			}
 		}
-		GTAGUI.generalMessage("test: " + test + ", test1: " + test1 + ", test2: " + test2 + ", test3: " + test3);
+		GTAGUI.generalMessage("test: " + test + ", test1: " + test1 + ", test2: " + test2 + ", test3: " + test3 + ", test4: " + test4);
 		return skuSubF;
 	}
 	
