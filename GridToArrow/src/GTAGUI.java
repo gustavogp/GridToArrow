@@ -79,11 +79,10 @@ public class GTAGUI extends JPanel implements ActionListener{
         		if (inputPath.list().length < 2) {
         			log.append("Source Folder is empty!" + newline);	
         		} else {
-        			GTAFunctions.countAndCheck(inputPath);
         			try {
         				Thread t = new Thread( new Runnable () {
         						public void run() {
-        					//		TemplateBuilder.createTemplate();
+        							GTAFunctions.countAndCheck(inputPath);
         						}
         				});
         				t.start();

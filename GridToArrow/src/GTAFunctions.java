@@ -72,7 +72,17 @@ public class GTAFunctions {
 		if(distie || name.contains("Mexico")) {
 			wkRow0 = sheet0.getRow(6);
 			//get the "Customer Name"
-			subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on").length());
+			if(name.contains("Mexico")) {
+				if(sheet0.getRow(4).getCell(1).getStringCellValue().contains("APR")) {
+					subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on 01.M -  Consumer - APR -").length());
+				} else {
+					subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on 01.M -  Consumer - Retail -").length());
+				}
+				
+			} else {
+				subName = sheet0.getRow(4).getCell(1).getStringCellValue().substring(("Report Drilled on").length());
+			}
+			
 		} else {
 			wkRow0 = sheet0.getRow(7);
 			//get the "Customer Name"
