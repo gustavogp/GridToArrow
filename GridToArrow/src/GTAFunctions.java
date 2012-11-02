@@ -202,14 +202,22 @@ public class GTAFunctions {
 						if (rw.getRowNum() > 6 && 
 								!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
 								!(rw.getCell(1).getStringCellValue().contains("Total")) && 
-								!(sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
+								!(rw.getCell(2).getNumericCellValue()==1 && rw.getCell(3).getNumericCellValue()==2 && rw.getCell(4).getNumericCellValue()==3)
+							/*	( (sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_BLANK) || 
+										( (sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_NUMERIC) &&
+												( ( (sheet0.getRow(rw.getRowNum()+2).getCell(2).getCellType()==Cell.CELL_TYPE_NUMERIC) )  || 
+														( (sheet0.getRow(rw.getRowNum()+2).getCell(2).getCellType()==Cell.CELL_TYPE_STRING) && !(sheet0.getRow(rw.getRowNum()+2).getCell(2).getStringCellValue().contains("Act")) ) 
+												)
+										)
+								) */
+							) {
 							subFPerWk.put(rw.getCell(1).getStringCellValue(), (new Double(rw.getCell(columnIndexSF).getNumericCellValue())).intValue());
 						}
 					} else {
 						if (rw.getRowNum() > 6 && 
 								!(rw.getCell(1).getCellType()==Cell.CELL_TYPE_BLANK) &&
 								!(rw.getCell(1).getStringCellValue().contains("Total")) && 
-								!(sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING)) {
+								!(sheet0.getRow(rw.getRowNum()+1).getCell(2).getCellType()==Cell.CELL_TYPE_STRING) ) {
 							subFPerWk.put(rw.getCell(1).getStringCellValue(), (new Double(rw.getCell(columnIndexSF).getNumericCellValue())).intValue());
 						}
 					}
